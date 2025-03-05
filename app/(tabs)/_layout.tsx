@@ -1,59 +1,100 @@
+import { Tabs } from 'expo-router';
 import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
-
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
-
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
-
+import { COLORS, FONTS } from '../../constants/theme'
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { TouchableOpacity, View } from 'react-native';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { MaterialIcons } from '@expo/vector-icons';
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
 
+  
   return (
+     // Check what value hp(1) return
     <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
-      }}>
+  screenOptions={{
+    tabBarActiveTintColor: COLORS.primary,  
+    tabBarInactiveTintColor: COLORS.gray, 
+    tabBarStyle: {
+      backgroundColor: COLORS.primary,
+      width: '96%',
+      paddingBottom: 5,
+      paddingTop: 5,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: 11,
+      position: 'absolute',   
+      bottom: hp(1),             
+      borderRadius: 15,        
+      shadowColor: '#000',    
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+
+    tabBarLabelStyle: {
+      color: COLORS.white, 
+    },
+    headerShown: true,
+  }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Home',
+          headerTitle: 'L-PRES',
+          
+          headerStyle: {
+            height: 80,
+
+          },
+          headerTitleStyle: {
+            ...FONTS.h3,
+            color: COLORS.primary, 
+          },
+          headerTitleAlign: 'left',
+
           headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+                            
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          
+          <MaterialCommunityIcons
+            name="translate"
+            size={24}
+            color={COLORS.primary}
+          />
+
+            </View>
+         
+              <TouchableOpacity onPress={() => console.log('Settings Pressed')}>
+                <MaterialCommunityIcons
+                  name="cog-outline"
+                  size={24}
+                  color={COLORS.primary}
+                  style={{ marginRight: 15, marginLeft: 15 }}
+                />
+              </TouchableOpacity>
+      
+            </View>
+          ),
+          tabBarIcon: ({ focused }) => (
+            <MaterialCommunityIcons name="map-marker-radius" size={24} color={focused ? COLORS.white : COLORS.white} />
           ),
         }}
       />
-      <Tabs.Screen
-        name="two"
+
+    
+<Tabs.Screen
+        name="farmers" 
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Farmers',
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <MaterialIcons name="people" size={24} color={focused ? COLORS.white : COLORS.white} />
+          ),
         }}
       />
     </Tabs>
   );
 }
+

@@ -3,32 +3,21 @@ import React from 'react';
 import { COLORS, FONTS } from '../../constants/theme'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { TouchableOpacity, View } from 'react-native';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { MaterialIcons } from '@expo/vector-icons';
+
 export default function TabLayout() {
 
-  
   return (
-     // Check what value hp(1) return
     <Tabs
   screenOptions={{
     tabBarActiveTintColor: COLORS.primary,  
     tabBarInactiveTintColor: COLORS.gray, 
     tabBarStyle: {
       backgroundColor: COLORS.primary,
-      width: '96%',
-      paddingBottom: 5,
-      paddingTop: 5,
       alignItems: 'center',
       justifyContent: 'center',
-      marginLeft: 11,
-      position: 'absolute',   
-      bottom: hp(1),             
-      borderRadius: 15,        
-      shadowColor: '#000',    
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.3,
-      shadowRadius: 3.84,
+      position: 'absolute',      
+      shadowColor: '#000',  
       elevation: 5,
     },
 
@@ -41,10 +30,10 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          headerTitle: 'L-PRES',
+          headerTitle: 'LivRes',
           
           headerStyle: {
-            height: 80,
+            height: 50,
 
           },
           headerTitleStyle: {
@@ -53,48 +42,81 @@ export default function TabLayout() {
           },
           headerTitleAlign: 'left',
 
-          headerRight: () => (
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+          // headerRight: () => (
+          //   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
                             
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          
-          <MaterialCommunityIcons
-            name="translate"
-            size={24}
-            color={COLORS.primary}
-          />
-
-            </View>
+          // <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          //   </View>
          
-              <TouchableOpacity onPress={() => console.log('Settings Pressed')}>
-                <MaterialCommunityIcons
-                  name="cog-outline"
-                  size={24}
-                  color={COLORS.primary}
-                  style={{ marginRight: 15, marginLeft: 15 }}
-                />
-              </TouchableOpacity>
+          //     <TouchableOpacity onPress={() => console.log('Settings Pressed')}>
+          //       <MaterialCommunityIcons
+          //         name="cog-outline"
+          //         size={24}
+          //         color={COLORS.primary}
+          //         style={{ marginRight: 15, marginLeft: 15 }}
+          //       />
+          //     </TouchableOpacity>
       
-            </View>
-          ),
+          //   </View>
+          // ), 
           tabBarIcon: ({ focused }) => (
             <MaterialCommunityIcons name="map-marker-radius" size={24} color={focused ? COLORS.white : COLORS.white} />
           ),
         }}
       />
 
-    
-<Tabs.Screen
-        name="farmers" 
+    <Tabs.Screen
+      name="resources"
+      options={{
+        headerShown: false,
+        title: 'Resources',
+        tabBarIcon: ({ focused }) => (
+          <MaterialCommunityIcons name="forest" size={24} color={focused ? COLORS.white : COLORS.white} />
+        ),
+      }}
+      />
+
+  <Tabs.Screen
+        name="notifications"
+
         options={{
-          title: 'Farmers',
           headerShown: false,
+          title: 'Notifications',
           tabBarIcon: ({ focused }) => (
-            <MaterialIcons name="people" size={24} color={focused ? COLORS.white : COLORS.white} />
+            <MaterialCommunityIcons name="bell" size={24} color={focused ? COLORS.white : COLORS.white} />
           ),
         }}
       />
+
+  <Tabs.Screen
+        name="faq"
+        options={{
+          title: 'FAQ',
+          headerStyle: {
+            height: 80,
+
+          },
+          headerTitleStyle: {
+            ...FONTS.h4, 
+            color: COLORS.primary, 
+          },
+          headerTitleAlign: 'center',
+
+          headerRight: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15 }}>
+          <MaterialIcons
+            name="question-answer"
+            size={24}
+            color={COLORS.primary}
+          />
+            </View>
+          ),
+          tabBarIcon: ({ focused }) => (
+            <MaterialCommunityIcons name="frequently-asked-questions" size={24} color={focused ? COLORS.white : COLORS.white} />
+          ),
+        }}
+      />
+      
     </Tabs>
   );
 }
-

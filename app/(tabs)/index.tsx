@@ -6,7 +6,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-nat
 const Index = () => {
 
     return (
-        <View style={{ flex: 1, alignItems: "center", backgroundColor: COLORS.white }}>
+        <View style={{ flex: 1, alignItems: "center", backgroundColor: COLORS.lightGray1 }}>
         
             {/* User and Settings Bar */}
             <View style={{width: '95%', height: hp(6), margin: 10, 
@@ -45,6 +45,34 @@ const Index = () => {
             <MaterialIcons name="wb-cloudy" size={60} color="white" />            
             </View>
             
+            </View>
+
+            {/* Livestock Count Bar */}
+            <View style={{width: '95%', height: hp(15), margin: 5, 
+            backgroundColor: COLORS.white, borderRadius: 10, }}>
+
+            <View style={{margin: 8}}>
+            <Text style={{...FONTS.h3, color: COLORS.black}}> Total Livestock </Text>
+            <Text style={{...FONTS.h2, color: COLORS.blue}}> 1,234 </Text>  
+            </View>
+
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
+            <View>        
+                <Text style={{...FONTS.h4, color: COLORS.black}}> 800 </Text>
+                <Text style={{...FONTS.h5, color: COLORS.gray}}> Cattle </Text>        
+            </View>
+
+            <View>        
+                <Text style={{...FONTS.h4, color: COLORS.black}}> 600 </Text>
+                <Text style={{...FONTS.h5, color: COLORS.gray}}> Sheep </Text>        
+            </View>
+
+            <View>        
+                <Text style={{...FONTS.h4, color: COLORS.black}}> 134 </Text>
+                <Text style={{...FONTS.h5, color: COLORS.gray}}> Goats </Text>        
+            </View>
+            </View>
+
             </View>
         
         </View>

@@ -2,7 +2,6 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { COLORS, FONTS } from '../../constants/theme'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { TouchableOpacity, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 
 export default function TabLayout() {
@@ -47,6 +46,18 @@ export default function TabLayout() {
           ),
         }}
       />
+      
+      <Tabs.Screen
+        name="livestock"
+        options={{
+          title: 'Livestock',
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <MaterialIcons name="pets" size={24} color={focused ? COLORS.white : COLORS.white} />
+          ),
+        }}
+      />
+
       <Tabs.Screen
         name="farmers"
         options={{
@@ -54,15 +65,6 @@ export default function TabLayout() {
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <MaterialIcons name="groups" size={24} color={focused ? COLORS.white : COLORS.white} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="livestock"
-        options={{
-          title: 'Livestock',
-          tabBarIcon: ({ focused }) => (
-            <MaterialIcons name="pets" size={24} color={focused ? COLORS.white : COLORS.white} />
           ),
         }}
       />

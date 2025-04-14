@@ -21,7 +21,7 @@ export default function FarmersList() {
     );
    
     const renderItem = ({ item }: { item: { id: number | string; title: string; iconName:string; state:string; lga:string; livestock: string[]; distance: string } }) => (
-       <Link href={{ pathname: "/farmers/[id]", params: { id: item.id } }} asChild>
+       <Link href={{ pathname: "/farmers/details", params: { id: item.id } }} asChild>
         <TouchableOpacity style={styles.resourceContainer}>
             <View style={styles.textContainer}>
                 <View style={styles.titleContainer}>

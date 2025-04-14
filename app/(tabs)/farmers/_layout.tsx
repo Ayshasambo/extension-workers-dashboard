@@ -1,53 +1,38 @@
-// import { Stack, useLocalSearchParams, useNavigation } from "expo-router";
-// import { TouchableOpacity } from "react-native"; 
-// import { MaterialIcons } from "@expo/vector-icons";
-// import { COLORS, FONTS } from "@/constants/theme"; 
-// import {farmers} from '@/constants/dummy'
+import { Stack } from 'expo-router';
+import React from 'react';
+import { COLORS, FONTS } from '@/constants/theme'
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { TouchableOpacity, View } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
-//  export default function FarmersLayout() {
-// //   const { id} = useLocalSearchParams(); 
-//   // const navigation = useNavigation(); 
+export default function FarmerLayout() {
 
-// //   //const farmer = farmers.find((f) => f.id.toString() === id); // Find the farmer
-// //   //const farmer = farmers.find((f) => f.id === Number(id));
-
-//   // return (
-//   //   <Stack
-//   //     screenOptions={{
-//   //       headerStyle: {
-//   //         backgroundColor: COLORS.primary,
-//   //       },
-//   //       headerTintColor: COLORS.white,
-//   //       headerTitleStyle: {
-//   //         ...FONTS.h3,
-//   //       },
-//   //     }}
-//   //   >
-//   //      {/* Farmers List Screen (farmers/index.tsx) */}
-//   //       <Stack.Screen
-//   //        name="index"
-//   //        options={{
-//   //          title: "Farmers",
-//   //          headerLeft: () => (
-//   //            <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10 }}>
-//   //              <MaterialIcons name="arrow-back" size={24} color={COLORS.white} />
-//   //            </TouchableOpacity>
-//   //          ),
-//   //        }}
-//   //      /> 
-
-// //       {/* Farmer Details Screen (farmers/[id].tsx) */}
-// //       {/* <Stack.Screen
-// //         name="[id]"
-// //         options={{
-// //           //title: farmer,//farmer ? farmer.title : "Farmer Details", // Set dynamic title
-// //           headerLeft: () => (
-// //             <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 10 }}>
-// //               <MaterialIcons name="arrow-back" size={24} color={COLORS.white} />
-// //             </TouchableOpacity>
-// //           ),
-// //         }}
-// //       /> */}
-//    //</Stack>
-//   //);
-//  }
+  return (
+    <Stack
+  screenOptions={{
+    headerShown: false,
+  }}>
+      <Stack.Screen
+        name="index"
+        options={{
+          title: 'Farmers',
+        
+        }}
+      />
+      <Stack.Screen
+        name="details"
+        options={{
+          title: 'Farmer Details',
+          headerShown: true
+        }}
+      />
+      <Stack.Screen
+        name="livestock"
+        options={{
+          title: 'Livestock',
+        }}
+      />
+      
+    </Stack>
+  );
+}

@@ -6,7 +6,7 @@ import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons} from '@expo/vector-icons';
 import {farmers} from '@/constants/dummy'
 
-export default function FarmersList() {
+export default function LivestockList() {
     const [searchQuery, setSearchQuery] = useState('');
 
     const category = "Farmers"; 

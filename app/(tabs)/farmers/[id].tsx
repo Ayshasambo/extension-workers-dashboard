@@ -1,14 +1,19 @@
 import React, { useState }  from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { farmers } from '@/constants/dummy';
+import { useRouter,useLocalSearchParams } from 'expo-router';
+import { farmers, states,workTypes } from '@/constants/dummy';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 export default function FarmerDetail() {
     const { id } = useLocalSearchParams();
+    const router = useRouter();
     const [activeMenu, setActiveMenu] = useState("Details");
     const farmer = farmers.find((f) => f.id.toString() === id);
+    const [selectedState, setSelectedState] = useState(farmer?.state || '');
+    const [selectedWorkType, setSelectedWorkType] = useState(farmer?.worktype || '');
+    
 
     if (!farmer) {
         return (
@@ -35,7 +40,8 @@ export default function FarmerDetail() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => setActiveMenu("Pets")}
+          //onPress={() => setActiveMenu("Pets")}
+          onPress={() => router.push(`/farmers/[id]/livestock`)}
           style={[styles.menuItem, activeMenu === "Pets" && styles.activeMenuItem]}
         >
           <MaterialIcons
@@ -72,11 +78,36 @@ export default function FarmerDetail() {
                 <Text style={styles.label}>Email</Text>
                 <TextInput style={styles.input} value={farmer.email} editable={false} />
 
-                <Text style={styles.label}>state</Text>
-                <TextInput style={styles.input} value={farmer.state} editable={false} /> 
+                <Text style={styles.label}>State</Text>
+                <View style={styles.pickerContainer}>
+                    <Picker
+                        selectedValue={selectedState}
+                        onValueChange={(itemValue) => setSelectedState(itemValue)}
+                        style={styles.picker}
+                    >
+                        {(states ?? []).map((state, index) => (
+                        <Picker.Item key={index} label={state} value={state} />
+                        ))}
+                    </Picker>
+                </View>
+                
 
-                <Text style={styles.label}>work type</Text>
-                <TextInput style={styles.input} value={farmer.worktype} editable={false} /> 
+                <Text style={styles.label}>Work Type</Text>
+                <View style={styles.pickerContainer}>
+                    <Picker
+                        selectedValue={selectedWorkType}
+                        onValueChange={(itemValue) => setSelectedWorkType(itemValue)}
+                        style={styles.picker}
+                    >
+                        {workTypes.map((work, index) => (
+                            <Picker.Item key={index} label={work} value={work} />
+                        ))}
+                    </Picker>
+                </View>
+
+                <TouchableOpacity style={styles.updateButton} onPress={() => console.log("Update button pressed")}>
+                 <Text style={styles.updateButtonText}>Update</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -91,19 +122,19 @@ const styles = StyleSheet.create({
     },
     navMenu: {
         flexDirection: "row",
-        backgroundColor: "#4CAF50",
-        padding: 15,
+        backgroundColor: "#36813A",
+        padding: 10,
         justifyContent: "space-around",
         borderRadius: 15, 
         margin: 10, 
-        width: "90%"
+        width: "80%"
       },
       menuItem: {
         paddingVertical: 8,
         paddingHorizontal: 15,
         borderRadius: 20,
         alignItems: "center",
-        backgroundColor: "#4CAF50",
+        backgroundColor: "#36813A",
         flexDirection: "column"
       },
       activeMenuItem: {
@@ -117,16 +148,17 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
       },
       activeMenuText: {
-        color: "#4CAF50",
+        color: "#5F6368",
       },
     imageContainer: {
         width: 120,
         height: 120,
         borderRadius: 15,
         overflow: 'hidden',
-        marginBottom: 20,
+        marginBottom: 10,
+        marginTop:10,
         borderWidth: 2,
-        borderColor: '#4CAF50',
+        borderColor: '#36813A',
     },
     image: {
         width: '100%',
@@ -147,6 +179,30 @@ const styles = StyleSheet.create({
         padding: 10,
         marginBottom: 15,
         backgroundColor: '#F7F7FA',
+    },
+    pickerContainer: {
+        borderWidth: 1,
+        borderColor: '#CCC',
+        borderRadius: 5,
+        marginBottom: 15,
+        backgroundColor: '#F7F7FA',
+    },
+    picker: {
+        height: 50,
+        width: '100%',
+    },
+    updateButton: {
+        backgroundColor: "#36813A",
+        padding: 15,
+        borderRadius: 10,
+        alignItems: "center",
+        marginTop: 10,
+        width: "100%",
+    },
+      updateButtonText: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: "bold",
     },
     errorText: {
         fontSize: 18,

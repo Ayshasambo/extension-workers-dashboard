@@ -13,45 +13,33 @@ export default function FarmersList() {
     const dataMapping = {
         "Farmers": farmers,
     };
-    
+   
     const data = dataMapping[category] || [];
-    console.log('Selected Data:', data); 
+    //console.log('Selected Data:', data); 
     const filteredData = data.filter((item) =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase())
+        //item.title.toLowerCase().includes(searchQuery.toLowerCase())
+        item.livestock.some((livestockItem) =>
+        livestockItem.type.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     );
    
-    const renderItem = ({ item }: { item: { id: number | string; title: string; iconName:string; state:string; lga:string; livestock: { type: string }[]; distance: string } }) => (
-       <Link href={{ pathname: "/farmers/[id]", params: { id: item.id } }} asChild>
-        <TouchableOpacity style={styles.resourceContainer}>
-            <View style={styles.textContainer}>
-                <View style={styles.titleContainer}>
-                    <Text style={styles.title}>{item.title}</Text>
-                </View>
-
-                <View style={styles.infoContainer}>
-                    <View style={styles.stateContainer}>
-                        <Text style={styles.stateText}>{item.state}</Text>
-                    </View> 
-
-                    <View style={styles.livestockContainer}>
-                        {/* <Text style={styles.livestockText}>{item.livestock.join(', ')}</Text> */}
-                        <Text style={styles.livestockText}> {item.livestock.map((liv) => liv.type).join(', ')}</Text>
-                    </View>
-
-                    <View style={styles.lgaContainer}>
-                        <Text style={styles.lgaText}>{item.lga}</Text>
-                    </View> 
-                </View>    
-            </View>
-
-            <View style={styles.distanceIconContainer}>
-                <View style={styles.distanceItem}>
-                    <MaterialIcons name="pets" size={25} color="#36813A" />
-                    <Text style={styles.distancetext}>{item.distance}</Text>
+    const renderItem = ({ item }: any) => (
+        <View style={styles.resourceContainer}>
+        {item.livestock.map((animal:any, index:number) => (
+            <View key={index} style={styles.livestockCountContainer}>
+                <Text style={styles.livestockCountText}>
+                    {animal.count} {animal.type}
+                </Text>
+                {/* Optional: Add the extra container below with health info */}
+                <View style={styles.livestockInfoContainer}>
+                    <Text>Health: {animal.healthStatus}</Text>
+                    <Text>Weight: {animal.averageWeight}</Text>
+                    <Text>Breed: {animal.breed}</Text>
+                    <Text>Age: {animal.averageAge}</Text>
                 </View>
             </View>
-        </TouchableOpacity>
-    </Link>
+        ))}
+    </View>
     );
  
     return (
@@ -135,6 +123,34 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 2,
         
+    },
+    // livestockCountContainer: {
+    //     backgroundColor: '#36813A',
+    //     padding: 10,
+    //     borderRadius: 8,
+    //     marginBottom: 10,
+    // },
+    // livestockCountText: {
+    //     fontSize: 18,
+    //     fontWeight: 'bold',
+    //     color: '#fff',
+    // },
+    livestockCountContainer: {
+        backgroundColor: '#e0f2f1',
+        padding: 10,
+        borderRadius: 10,
+       // marginBottom: 5,
+    },
+    livestockCountText: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        color: '#00796b',
+    },  
+    livestockInfoContainer: {
+        backgroundColor: '#f9fbe7',
+        padding: 8,
+        borderRadius: 8,
+        marginTop: 5,
     },
     textContainer: {
         flex: 1,
@@ -250,6 +266,33 @@ const styles = StyleSheet.create({
         color: "#333",
     },
 });
+
+// import { View, Text, StyleSheet } from 'react-native';
+// import { useLocalSearchParams } from 'expo-router';
+
+// export default function LivestockPage() {
+//   const { id } = useLocalSearchParams();
+
+//   return (
+//     <View style={styles.container}>
+//       <Text style={styles.title}>Livestock for Farmer ID: {id}</Text>
+//       {/* Add livestock info here */}
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     padding: 20,
+//     backgroundColor: "#FFF"
+//   },
+//   title: {
+//     fontSize: 20,
+//     fontWeight: 'bold',
+//     marginBottom: 10
+//   }
+// });
 
 
 

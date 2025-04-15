@@ -6,28 +6,7 @@ import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons} from '@expo/vector-icons';
 import {farmers} from '@/constants/dummy'
 
-
-export default function FarmersList() {
-    type FarmerType = {
-        id: number;
-        title: string;
-        iconName: string;
-        lga: string;
-        state: string;
-        distance: string;
-        email: string;
-        worktype: string;
-        livestock: {
-          type: string;
-          count: number;
-          breed: string;
-          averageWeight: string;
-          averageAge: string;
-          healthStatus: string;
-        }[];
-      };
-      
-
+export default function LivestockList() {
     const [searchQuery, setSearchQuery] = useState('');
 
     const category = "Farmers"; 
@@ -41,7 +20,7 @@ export default function FarmersList() {
         item.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
    
-    const renderItem = ({ item }: { item: FarmerType }) => (
+    const renderItem = ({ item }: { item: { id: number | string; title: string; iconName:string; state:string; lga:string; livestock: string[]; distance: string } }) => (
        <Link href={{ pathname: "/farmers/details", params: { id: item.id } }} asChild>
         <TouchableOpacity style={styles.resourceContainer}>
             <View style={styles.textContainer}>
@@ -55,10 +34,7 @@ export default function FarmersList() {
                     </View> 
 
                     <View style={styles.livestockContainer}>
-                        {/* <Text style={styles.livestockText}>{item.livestock.join(', ')}</Text> */}
-                        <Text style={styles.livestockText}>
-                        {item.livestock?.map((liv: any) => `${liv.count} ${liv.type}`).join(', ')}
-                        </Text>
+                        <Text style={styles.livestockText}>{item.livestock.join(', ')}</Text>
                     </View>
 
                     <View style={styles.lgaContainer}>
@@ -69,7 +45,7 @@ export default function FarmersList() {
 
             <View style={styles.distanceIconContainer}>
                 <View style={styles.distanceItem}>
-                    <MaterialIcons name="pets" size={25} color="#36813A" />
+                    <MaterialIcons name="pets" size={25} color="#5F6368" />
                     <Text style={styles.distancetext}>{item.distance}</Text>
                 </View>
             </View>
@@ -90,19 +66,12 @@ export default function FarmersList() {
                     /> 
                 </View>
 
-                {/* <FlatList
+                <FlatList
                     data={filteredData} 
                     renderItem={renderItem}
                     keyExtractor={(item) => item.id.toString()}
                     ListEmptyComponent={<Text>No data available for this resource.</Text>}
-                /> */}
-                <FlatList<FarmerType>
-  data={filteredData}
-  renderItem={renderItem}
-  keyExtractor={(item) => item.id.toString()}
-  ListEmptyComponent={<Text>No data available for this resource.</Text>}
-/>
-
+                />
             </View>
             
         </View>

@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     },
     searchBar: {
         flex: 1, 
-        height: hp('5%'),
+        height: hp('7%'),
     },
     searchIcon: {
         marginRight: 10, 

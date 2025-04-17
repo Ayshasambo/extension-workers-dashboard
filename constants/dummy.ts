@@ -6,10 +6,43 @@
       iconName:"pets", 
       lga: "Misau",
       state: "Bauchi",
-      //livestock: ['Goats', 'Sheep'],
       distance: '1800km',
       email:"aishamsambo@gmail.com",
       worktype:"extension worker",
+      vaccination: [
+        {
+          diseaseType: 'Clostridial Disease',
+          count: 24,
+          status: 'Pending',
+          nextDue: 'Oct 12, 2025',
+          lastVaccinated: 'January 20, 2025',
+          animalType: 'Goats'
+        },
+        {
+          diseaseType: 'NewCatle',
+          count: 25,
+          status: 'Needs update',
+          nextDue: 'Oct 30, 2025',
+          lastVaccinated: 'January 10, 2025',
+          animalType: 'Sheep'
+        },
+        {
+          diseaseType: 'Brucellosis',
+          count: 10,
+          status: 'Upto date',
+          nextDue: 'Oct 30, 2025',
+          lastVaccinated: 'January 10, 2025',
+          animalType: 'Sheep'
+        },
+        {
+          diseaseType: 'Foot and Mouth Disease',
+          count: 5,
+          status: 'Pending',
+          nextDue: 'Oct 30, 2025',
+          lastVaccinated: 'January 10, 2025',
+          animalType: 'Sheep'
+        },
+      ],
       livestock: [
         {
           type: 'Goats',
@@ -17,16 +50,32 @@
           breed: 'Boer',
           averageWeight: '70kg',
           averageAge: '2 years',
-          healthStatus: 'Healthy'
+          healthStatus: '100%'
         },
         {
           type: 'Sheep',
           count: 15,
           breed: 'Dorper',
           averageWeight: '60kg',
-          averageAge: '1.5 years',
-          healthStatus: 'Healthy'
-        }
+          averageAge: '2 months',
+          healthStatus: '90%'
+        },
+        {
+          type: 'Cows',
+          count: 15,
+          breed: 'Red Angus',
+          averageWeight: '30kg',
+          averageAge: '1 year',
+          healthStatus: '80%'
+        },
+        {
+          type: 'Pig',
+          count: 15,
+          breed: 'Hamshire',
+          averageWeight: '75kg',
+          averageAge: '3 years',
+          healthStatus: '60%'
+        },
       ]
       
     },
@@ -40,22 +89,56 @@
       distance: '200km',
       email:"aishamsambo@gmail.com",
       worktype:"extension worker",
+      vaccination: [
+        {
+          diseaseType: 'Clostridial Disease',
+          count: 24,
+          status: 'Pending',
+          nextDue: 'Oct 12, 2025',
+          lastVaccinated: 'January 20, 2025',
+          animalType: 'Goats'
+        },
+        {
+          diseaseType: 'NewCatle',
+          count: 25,
+          status: 'Pending',
+          nextDue: 'Oct 30, 2025',
+          lastVaccinated: 'January 10, 2025',
+          animalType: 'Sheep'
+        },
+        {
+          diseaseType: 'Brucellosis',
+          count: 10,
+          status: 'Pending',
+          nextDue: 'Oct 30, 2025',
+          lastVaccinated: 'January 10, 2025',
+          animalType: 'Sheep'
+        },
+        {
+          diseaseType: 'Contagious Caprine Pleuropneumonia',
+          count: 5,
+          status: 'Pending',
+          nextDue: 'Oct 30, 2025',
+          lastVaccinated: 'January 10, 2025',
+          animalType: 'Sheep'
+        },
+      ],
       livestock: [
         {
-          type: 'Goats',
+          type: 'pigs',
           count: 24,
           breed: 'Boer',
           averageWeight: '70kg',
           averageAge: '2 years',
-          healthStatus: 'Healthy'
+          healthStatus: '50%'
         },
         {
-          type: 'Sheep',
+          type: 'cows',
           count: 15,
           breed: 'Dorper',
           averageWeight: '60kg',
           averageAge: '1.5 years',
-          healthStatus: 'Healthy'
+          healthStatus: '99%'
         }
       ]
     },
@@ -65,10 +148,43 @@
         title: "Ahmad Muhammad",
         lga: "Zaria",
         state: "Kafanchan",
-        //livestock: ['Cow', 'Chickens', 'Goats' ],
         distance: '200km',
         email:"aishamsambo@gmail.com",
         worktype:"extension worker",
+        vaccination: [
+          {
+            diseaseType: 'Clostridial Disease',
+            count: 24,
+            status: 'Pending',
+            nextDue: 'Oct 12, 2025',
+            lastVaccinated: 'January 20, 2025',
+            animalType: 'Goats'
+          },
+          {
+            diseaseType: 'NewCatle',
+            count: 25,
+            status: 'Pending',
+            nextDue: 'Oct 30, 2025',
+            lastVaccinated: 'January 10, 2025',
+            animalType: 'Sheep'
+          },
+          {
+            diseaseType: 'Brucellosis',
+            count: 10,
+            status: 'Pending',
+            nextDue: 'Oct 30, 2025',
+            lastVaccinated: 'January 10, 2025',
+            animalType: 'Sheep'
+          },
+          {
+            diseaseType: 'Contagious Caprine Pleuropneumonia',
+            count: 5,
+            status: 'Pending',
+            nextDue: 'Oct 30, 2025',
+            lastVaccinated: 'January 10, 2025',
+            animalType: 'Sheep'
+          },
+        ],
         livestock: [
           {
             type: 'Goats',
@@ -76,15 +192,15 @@
             breed: 'Boer',
             averageWeight: '70kg',
             averageAge: '2 years',
-            healthStatus: 'Healthy'
+            healthStatus: '60%'
           },
           {
             type: 'Sheep',
             count: 15,
             breed: 'Dorper',
             averageWeight: '60kg',
-            averageAge: '1.5 years',
-            healthStatus: 'Healthy'
+            averageAge: '5 years',
+            healthStatus: '10%'
           }
         ]
       },
@@ -94,10 +210,43 @@
         title: "Kallamu Yahya Yunusa",
         lga: "kankara",
         state: "Katsina",
-        //livestock: ['Cow', 'Chickens', 'Sheep', 'Goats' ],
         distance: '200km',
         email:"aishamsambo@gmail.com",
         worktype:"extension worker",
+        vaccination: [
+          {
+            diseaseType: 'Clostridial Disease',
+            count: 24,
+            status: 'Pending',
+            nextDue: 'Oct 12, 2025',
+            lastVaccinated: 'January 20, 2025',
+            animalType: 'Goats'
+          },
+          {
+            diseaseType: 'NewCatle',
+            count: 25,
+            status: 'Pending',
+            nextDue: 'Oct 30, 2025',
+            lastVaccinated: 'January 10, 2025',
+            animalType: 'Sheep'
+          },
+          {
+            diseaseType: 'Brucellosis',
+            count: 10,
+            status: 'Pending',
+            nextDue: 'Oct 30, 2025',
+            lastVaccinated: 'January 10, 2025',
+            animalType: 'Sheep'
+          },
+          {
+            diseaseType: 'Contagious Caprine Pleuropneumonia',
+            count: 5,
+            status: 'Pending',
+            nextDue: 'Oct 30, 2025',
+            lastVaccinated: 'January 10, 2025',
+            animalType: 'Sheep'
+          },
+        ],
         livestock: [
           {
             type: 'Goats',
@@ -105,7 +254,7 @@
             breed: 'Boer',
             averageWeight: '70kg',
             averageAge: '2 years',
-            healthStatus: 'Healthy'
+            healthStatus: '20%'
           },
           {
             type: 'Sheep',
@@ -113,7 +262,7 @@
             breed: 'Dorper',
             averageWeight: '60kg',
             averageAge: '1.5 years',
-            healthStatus: 'Healthy'
+            healthStatus: '98%'
           }
         ]
       },
@@ -123,10 +272,43 @@
         title: "Larai Jibril",
         lga: "Gwagwalada",
         state: "Abuja",
-       // livestock: ['Cow', 'Chickens' ],
         distance: '200km',
         email:"aishamsambo@gmail.com",
         worktype:"extension worker",
+        vaccination: [
+          {
+            diseaseType: 'Clostridial Disease',
+            count: 24,
+            status: 'Pending',
+            nextDue: 'Oct 12, 2025',
+            lastVaccinated: 'January 20, 2025',
+            animalType: 'Goats'
+          },
+          {
+            diseaseType: 'NewCatle',
+            count: 25,
+            status: 'Pending',
+            nextDue: 'Oct 30, 2025',
+            lastVaccinated: 'January 10, 2025',
+            animalType: 'Sheep'
+          },
+          {
+            diseaseType: 'Brucellosis',
+            count: 10,
+            status: 'Pending',
+            nextDue: 'Oct 30, 2025',
+            lastVaccinated: 'January 10, 2025',
+            animalType: 'Sheep'
+          },
+          {
+            diseaseType: 'Contagious Caprine Pleuropneumonia',
+            count: 5,
+            status: 'Pending',
+            nextDue: 'Oct 30, 2025',
+            lastVaccinated: 'January 10, 2025',
+            animalType: 'Sheep'
+          },
+        ],
         livestock: [
           {
             type: 'Goats',
@@ -134,7 +316,7 @@
             breed: 'Boer',
             averageWeight: '70kg',
             averageAge: '2 years',
-            healthStatus: 'Healthy'
+            healthStatus: '10%'
           },
           {
             type: 'Sheep',
@@ -142,7 +324,7 @@
             breed: 'Dorper',
             averageWeight: '60kg',
             averageAge: '1.5 years',
-            healthStatus: 'Healthy'
+            healthStatus: '15%'
           }
         ]
       },
@@ -152,10 +334,43 @@
         title: "Aisha Sambo",
         lga: "Zaria",
         state: "Kaduna",
-        //livestock: ['Cow', 'Chickens' ],
         distance: '200km',
         email:"aishamsambo@gmail.com",
         worktype:"extension worker",
+        vaccination: [
+          {
+            diseaseType: 'Clostridial Disease',
+            count: 24,
+            status: 'Pending',
+            nextDue: 'Oct 12, 2025',
+            lastVaccinated: 'January 20, 2025',
+            animalType: 'Goats'
+          },
+          {
+            diseaseType: 'NewCatle',
+            count: 25,
+            status: 'Pending',
+            nextDue: 'Oct 30, 2025',
+            lastVaccinated: 'January 10, 2025',
+            animalType: 'Sheep'
+          },
+          {
+            diseaseType: 'Brucellosis',
+            count: 10,
+            status: 'Pending',
+            nextDue: 'Oct 30, 2025',
+            lastVaccinated: 'January 10, 2025',
+            animalType: 'Sheep'
+          },
+          {
+            diseaseType: 'Contagious Caprine Pleuropneumonia',
+            count: 5,
+            status: 'Pending',
+            nextDue: 'Oct 30, 2025',
+            lastVaccinated: 'January 10, 2025',
+            animalType: 'Sheep'
+          },
+        ],
         livestock: [
           {
             type: 'Goats',
@@ -163,7 +378,7 @@
             breed: 'Boer',
             averageWeight: '70kg',
             averageAge: '2 years',
-            healthStatus: 'Healthy'
+            healthStatus: '70%'
           },
           {
             type: 'Sheep',
@@ -171,7 +386,7 @@
             breed: 'Dorper',
             averageWeight: '60kg',
             averageAge: '1.5 years',
-            healthStatus: 'Healthy'
+            healthStatus: '80%'
           }
         ]
       },
@@ -192,7 +407,7 @@
             breed: 'Boer',
             averageWeight: '70kg',
             averageAge: '2 years',
-            healthStatus: 'Healthy'
+            healthStatus: '20%'
           },
           {
             type: 'Sheep',
@@ -200,7 +415,7 @@
             breed: 'Dorper',
             averageWeight: '60kg',
             averageAge: '1.5 years',
-            healthStatus: 'Healthy'
+            healthStatus: '99%'
           }
         ]
       },

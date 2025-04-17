@@ -7,26 +7,25 @@ export default function FarmerLayout() {
   return (
     <Stack
   screenOptions={{
-    headerShown: false,
+    headerShown: true,
   }}>
       <Stack.Screen
         name="index"
         options={{
           title: 'Farmers',
-        
         }}
       />
       <Stack.Screen
         name="details"
         options={{
-          title: 'Farmer Details',
+          title: 'Farmer',
           headerShown: true
         }}
       />
       <Stack.Screen
         name="livestock"
         options={{
-          title: 'Livestock',
+          title: 'Farmers Livestock',
         }}
       />
       

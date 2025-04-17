@@ -12,7 +12,7 @@ export default function LivestockLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Livestock Manager',
+          title: 'Livestock',
         
         }}
       />
@@ -20,7 +20,7 @@ export default function LivestockLayout() {
         name="details"
         options={{
           title: 'Livestock Manager Details',
-          headerShown: true
+          headerShown: false
         }}
       />
       

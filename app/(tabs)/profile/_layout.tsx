@@ -12,15 +12,8 @@ export default function LivestockLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Livestock',
+          title: 'Profile',
         
-        }}
-      />
-      <Stack.Screen
-        name="details"
-        options={{
-          title: 'Livestock Manager Details',
-          headerShown: false
         }}
       />
       

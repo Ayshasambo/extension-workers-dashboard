@@ -30,7 +30,7 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           headerTitle: 'LivRes',
-          
+          headerShown: false,
           headerStyle: {
             height: 50,
 
@@ -46,7 +46,7 @@ export default function TabLayout() {
           ),
         }}
       />
-      
+{/*       
       <Tabs.Screen
         name="livestock"
         options={{
@@ -56,7 +56,7 @@ export default function TabLayout() {
             <MaterialIcons name="pets" size={24} color={focused ? COLORS.white : COLORS.white} />
           ),
         }}
-      />
+      /> */}
 
       <Tabs.Screen
         name="farmers"
@@ -68,6 +68,28 @@ export default function TabLayout() {
           ),
         }}
       />
+
+<Tabs.Screen
+        name="notifications"
+        options={{
+          title: 'Notifications',
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <MaterialIcons name="notifications" size={24} color={focused ? COLORS.white : COLORS.white} />
+          ),
+        }}
+      />
+
+ <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <MaterialIcons name="person" size={24} color={focused ? COLORS.white : COLORS.white} />
+          ),
+        }}
+      />     
       
     </Tabs>
   );

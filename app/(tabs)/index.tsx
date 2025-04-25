@@ -1,14 +1,16 @@
-import { COLORS, FONTS } from "@/constants/theme";
+import { COLORS, FONTS } from "../../constants/theme";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import * as Progress from "react-native-progress";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 const Index = () => {
     const [progress, setProgress] = useState(0.4);
+    const {user} = useAuth()
+    console.log(user)
     
-
     return (
         <ScrollView style={{ flex: 1, backgroundColor: COLORS.lightGray1, }}>
         
@@ -37,12 +39,12 @@ const Index = () => {
                     backgroundColor: '#FF512F', borderRadius: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
             
             <View>        
-                <Text style={{...FONTS.body2, color: COLORS.white}}> Kaduna </Text>
+                <Text style={{...FONTS.body2, color: COLORS.white}}> Bauchi </Text>
                 <Text style={{...FONTS.body3, color: COLORS.white}}> Cloudy </Text>        
             </View>
 
             <View >        
-                <Text style={{...FONTS.body1, color: COLORS.white}}> 32°C </Text>        
+                <Text style={{...FONTS.body1, color: COLORS.white}}> 39°C </Text>        
             </View>
 
             <View>  
@@ -130,9 +132,9 @@ const Index = () => {
 
             <View style={{margin: 8}}>
             <Text style={{...FONTS.h3, color: COLORS.black}}> Recent Alerts</Text>
-            <Text style={{...FONTS.h2, color: COLORS.blue}}> 150 </Text>  
+            <Text style={{...FONTS.body4, color: COLORS.black}}> No new alerts yet. </Text>  
             </View>
-
+{/* 
             <View style={{flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'space-around', marginLeft: 8}}>
             <View>        
                 <Text style={{...FONTS.body4, color: COLORS.black}}> Animals in Breeding Cycle </Text> 
@@ -147,7 +149,7 @@ const Index = () => {
                 <Progress.Bar progress={0.6} width={wp(85)} height={10}/>  
             </View>
 
-            </View>
+            </View> */}
 
         </View>
 

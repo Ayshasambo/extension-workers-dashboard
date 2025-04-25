@@ -26,9 +26,16 @@ export default function FarmerLayout() {
         name="livestock"
         options={{
           title: 'Farmers Livestock',
+
         }}
       />
-      
+      <Stack.Screen
+        name="vaccination"
+        options={{
+          title: 'Vaccination',
+          
+        }}
+      />
     </Stack>
   );
 }

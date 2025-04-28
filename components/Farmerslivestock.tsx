@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native';
-import { Link, useLocalSearchParams, useRouter } from 'expo-router';
-import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
-import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { livestockList } from '@/constants/dummy';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { MaterialIcons } from '@expo/vector-icons';
+import { farmers } from '@/constants/dummy';
 
-export default function LivestockList() {
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const filteredLivestock = livestockList.filter((item) =>
-    item.type.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+type LivestockProps = {
+    farmerId: number; 
+  };
+  
+  export default function Livestock({ farmerId }: LivestockProps) {
+    const [searchQuery, setSearchQuery] = useState('');
+    const farmer = farmers.find((farmer) => farmer.id === farmerId);
+    const filteredLivestock = farmer?.livestock?.filter((animal) =>
+      animal.type.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || [];
 
   const renderItem = ({ item }: any) => (
     <View style={styles.resourceContainer}>
@@ -66,11 +68,6 @@ export default function LivestockList() {
         keyExtractor={(_, index) => index.toString()}
         ListEmptyComponent={<Text>No livestock found.</Text>}
       />
-      <Link href="/livestock/livestockmanager" asChild>
-                    <TouchableOpacity style={styles.floatingButton}>
-                        <MaterialIcons name="add" size={28} color="#fff" />
-                    </TouchableOpacity>
-                </Link>
     </View>
   );
 }
@@ -80,8 +77,7 @@ const styles = StyleSheet.create({
        width: wp('100%'), 
        alignSelf:'center',
        marginTop:20,
-       flex:1,
-       marginBottom:40
+       flex:1
     },
     searchContainer: {
         flexDirection: 'row',
@@ -185,57 +181,75 @@ const styles = StyleSheet.create({
         color: '#7F8C8D',
         fontWeight: 400,
       },
-      floatingButton: {
-        position: 'absolute',
-        bottom: hp('4%'), // Adjust as needed
-        right: wp('5%'),
-        backgroundColor: '#36813A',
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 2,
-      },
-      
 });
 
-
-
-// import React from 'react';
-// import { View, Text, StyleSheet } from 'react-native';
-
-// export default function TestPage() {
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.text}>This page is rendering correctly ✅</Text>
-//     </View>
-//   );
-// }
-
 // const styles = StyleSheet.create({
-//   container: {
+//   innerContainer: {
 //     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: '#F0F0F0',
+//     padding: wp('5%'),
+//     backgroundColor: '#fff',
 //   },
-//   text: {
+//   searchContainer: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     backgroundColor: '#F1F3F4',
+//     borderRadius: 8,
+//     paddingHorizontal: 10,
+//     marginBottom: hp('2%'),
+//   },
+//   searchIcon: {
+//     marginRight: 10,
+//   },
+//   searchBar: {
+//     flex: 1,
+//     height: hp('6%'),
+//     fontSize: 16,
+//   },
+//   resourceContainer: {
+//     backgroundColor: '#f9f9f9',
+//     borderRadius: 10,
+//     padding: wp('4%'),
+//     marginBottom: hp('2%'),
+//     elevation: 2,
+//   },
+//   livestockCountContainer: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     marginBottom: hp('1.5%'),
+//   },
+//   livestockCountText: {
 //     fontSize: 18,
 //     fontWeight: 'bold',
-//     color: '#333',
+//   },
+//   livestockInfoContainer: {
+//     flexDirection: 'row',
+//     flexWrap: 'wrap',
+//     justifyContent: 'space-between',
+//   },
+//   healthItemContainer: {
+//     alignItems: 'center',
+//     marginBottom: hp('1.5%'),
+//   },
+//   healthItem: {
+//     backgroundColor: '#168543',
+//     padding: 8,
+//     borderRadius: 5,
+//   },
+//   healthValue: {
+//     color: '#fff',
+//     fontWeight: 'bold',
+//   },
+//   infoItem: {
+//     width: '45%',
+//     marginBottom: hp('1.5%'),
+//   },
+//   infoValue: {
+//     fontWeight: 'bold',
+//     fontSize: 16,
+//   },
+//   infoLabel: {
+//     color: '#666',
+//     fontSize: 12,
 //   },
 // });
-
-
-
-
-
-
-
-
 

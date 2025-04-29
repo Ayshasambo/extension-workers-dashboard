@@ -69,18 +69,7 @@ export default function TabLayout() {
         }}
       />
 
-<Tabs.Screen
-        name="notifications"
-        options={{
-          title: 'Notifications',
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <MaterialIcons name="notifications" size={24} color={focused ? COLORS.white : COLORS.white} />
-          ),
-        }}
-      />
-
- <Tabs.Screen
+     <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
@@ -89,7 +78,18 @@ export default function TabLayout() {
             <MaterialIcons name="person" size={24} color={focused ? COLORS.white : COLORS.white} />
           ),
         }}
-      />     
+      />
+
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: 'Notification',
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <MaterialIcons name="notifications" size={24} color={focused ? COLORS.white : COLORS.white} />
+          ),
+        }}
+      />
       
     </Tabs>
   );

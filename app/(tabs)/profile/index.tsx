@@ -1,120 +1,153 @@
-// import React, { useState,  } from 'react';
-// import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native';
-// import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
-// import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
-// import { Link, useLocalSearchParams, useRouter } from 'expo-router';
-// import { MaterialIcons} from '@expo/vector-icons';
-// import {farmers} from '@/constants/dummy'
-
-// export default function LivestockManager() {
-//     const { id } = useLocalSearchParams(); // get the id from route params
-//     const [searchQuery, setSearchQuery] = useState('');
-//     const router = useRouter();
-
-//     const farmer = farmers.find((farmer) => farmer.id.toString() === id);
-
-//     const filteredLivestock = farmer?.livestock?.filter((animal) =>
-//         animal.type.toLowerCase().includes(searchQuery.toLowerCase())
-//     ) || [];
-
-//     const renderItem = ({ item }: any) => (
-//         <View style={styles.resourceContainer}>  
-
-        
-//         </View>
-//     );
- 
-//     return (
-//         <View style={styles.container}>
-//             <View style={styles.innerContainer}>
-//             <View style={styles.searchContainer}>
-//                     <MaterialIcons name="search" size={24} color="#5F6368" style={styles.searchIcon} />
-//                     <TextInput
-//                         style={styles.searchBar}
-//                         placeholder="Search here"
-//                         value={searchQuery}
-//                         onChangeText={setSearchQuery}
-//                     /> 
-//                 </View>
-
-//                 <FlatList
-//                     data={filteredLivestock}
-//                     renderItem={renderItem}
-//                     keyExtractor={(_, index) => index.toString()}
-//                     ListEmptyComponent={<Text>No livestock found.</Text>}
-//                 />
-//             </View>
-            
-//         </View>
-//     );
-// }
-
-// const styles = StyleSheet.create({
-//     container: {
-//         backgroundColor: '#FFFFFF',
-//         flex:1,
-//     },
-//     innerContainer:{
-//        width: wp('100%'), 
-//        alignSelf:'center',
-//        marginTop:20,
-//        flex:1
-//     },
-//     searchContainer: {
-//         flexDirection: 'row',
-//         alignItems: 'center',
-//         width: wp('90%'),
-//         alignSelf: 'center',
-//         marginBottom: 10,
-//         borderWidth: 1,
-//         borderColor: '#F7F7FA',
-//         borderRadius: 7,
-//         paddingHorizontal: 10, 
-//         backgroundColor: '#FFFFFF',
-//         borderTopWidth: 0,
-//         shadowColor: '#5A5B6A', 
-//         shadowOffset: {width: 0, height: 2},
-//         shadowOpacity: 0.1, 
-//         shadowRadius: 5, 
-//         elevation: 5, 
-//     },
-//     searchBar: {
-//         flex: 1, 
-//         height: hp('5%'),
-//     },
-//     searchIcon: {
-//         marginRight: 10, 
-//     },
-//     tuneIcon: {
-//         marginLeft: 10,  
-//     },
-//     resourceContainer: {
-//         flexDirection: 'column',
-//         paddingHorizontal: 10,
-//         marginHorizontal: 10,
-//         backgroundColor: '#FFFFFF',
-//         borderColor: '#F7F7FA',
-//         borderRadius: 7,
-//         // paddingBottom:15,
-//         // paddingTop:15,
-//         padding: 15,
-//         marginVertical: 5,
-//         marginBottom:10,
-//         height:hp('13%'),
-//         shadowColor: '#000',
-//         shadowOffset: { width: 0, height: 2 },
-//         shadowOpacity: 0.1,
-//         shadowRadius: 5,
-//         elevation: 2,
-        
-//     },
-// })
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import {extensionWorker, workTypes} from '@/constants/dummy'
+import { Picker } from '@react-native-picker/picker';
+import * as ImagePicker from 'expo-image-picker';
+const defaultImage = {img: require('./../../../assets/images/cow.jpg') }
 
 
+export default function Profile() {
+  const [image, setImage] = useState<string | null>(null);
+  const [name, setName] = useState(extensionWorker.name);
+  const [email, setEmail] = useState(extensionWorker.email);
+  const [phone, setPhone] = useState(extensionWorker.phone);
+  const [lga, setLga] = useState(extensionWorker.lga);
+  const [state, setState] = useState(extensionWorker.state);
+  const [selectedWorkType, setSelectedWorkType] = useState(extensionWorker.worktype || '');
 
+  const handleSave = () => {
+    console.log('Updated info:', { name, email, phone, lga, state });
+  };
 
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.imageContainer}>
+        <Image source={image ? { uri: image } : defaultImage.img} style={styles.profileImage} />
+        </View>
+      <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Name"/>
+      <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Email" keyboardType="email-address" />
+      <TextInput style={styles.input} value={phone} onChangeText={setPhone} placeholder="Phone" keyboardType="phone-pad" />
+      <TextInput style={styles.input} value={lga} onChangeText={setLga} placeholder="LGA" />
+      <TextInput style={styles.input} value={state} onChangeText={setState} placeholder="State" />
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedWorkType}
+            onValueChange={(itemValue) => setSelectedWorkType(itemValue)}
+            style={styles.picker}
+          >
+            {workTypes.map((work, index) => (
+              <Picker.Item key={index} label={work} value={work} />
+            ))}
+          </Picker>
+        </View>
+        <TouchableOpacity style={styles.uploadField} onPress={async () => {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+                alert('Permission is required to access media library');
+                return;
+            }
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                quality: 1,
+            });
 
+            if (!result.canceled) {
+                setImage(result.assets[0].uri);
+            }
+            }}>
+            <MaterialIcons name="cloud-upload" size={24} color="#aaa" />
+            <Text style={styles.placeholder}>Upload Photo</Text>
+        </TouchableOpacity>
 
+        <TouchableOpacity style={styles.button} onPress={handleSave}>
+            <Text style={styles.buttonText}>Update</Text>
+        </TouchableOpacity>
+    </ScrollView>
+  );
+}
 
-
-
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    gap: 10,
+  },
+  imageContainer: {
+    width: 120,
+    height: 120,
+    alignSelf:'center',
+    borderRadius: 15,
+    overflow: 'hidden',
+    marginBottom: 10,
+    marginTop: 10,
+    borderWidth: 2,
+    borderColor: '#36813A',
+    
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    marginBottom: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 15,
+    backgroundColor: '#F7F7FA',
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginBottom: 20,
+    backgroundColor: '#F7F7FA',
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  uploadField: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    height: 50,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    backgroundColor: '#F7F7FA',
+    //backgroundColor: '#f9f9f9',
+  },
+  placeholder: {
+    marginLeft: 10,
+    color: '#999',
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: '#36813A', 
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom:80
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});

@@ -7,6 +7,7 @@ import { MaterialIcons} from '@expo/vector-icons';
 import {farmers} from '@/constants/dummy'
 
 
+
 export default function FarmersList() {
     type FarmerType = {
         id: number;
@@ -36,13 +37,13 @@ export default function FarmersList() {
     };
     
     const data = dataMapping[category] || [];
-    console.log('Selected Data:', data); 
+    //console.log('Selected Data:', data); 
     const filteredData = data.filter((item) =>
         item.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
    
     const renderItem = ({ item }: { item: FarmerType }) => (
-       <Link href={{ pathname: "/farmers/details", params: { id: item.id } }} asChild>
+       <Link href={{ pathname: "/farmers/profile", params: { id: item.id } }} asChild>
         <TouchableOpacity style={styles.resourceContainer}>
             <View style={styles.textContainer}>
                 <View style={styles.titleContainer}>
@@ -80,7 +81,7 @@ export default function FarmersList() {
     return (
         <View style={styles.container}>
             <View style={styles.innerContainer}>
-            <View style={styles.searchContainer}>
+                <View style={styles.searchContainer}>
                     <MaterialIcons name="search" size={24} color="#5F6368" style={styles.searchIcon} />
                     <TextInput
                         style={styles.searchBar}
@@ -89,19 +90,17 @@ export default function FarmersList() {
                         onChangeText={setSearchQuery}
                     /> 
                 </View>
-
-                {/* <FlatList
-                    data={filteredData} 
+                <FlatList<FarmerType>
+                    data={filteredData}
                     renderItem={renderItem}
                     keyExtractor={(item) => item.id.toString()}
                     ListEmptyComponent={<Text>No data available for this resource.</Text>}
-                /> */}
-                <FlatList<FarmerType>
-  data={filteredData}
-  renderItem={renderItem}
-  keyExtractor={(item) => item.id.toString()}
-  ListEmptyComponent={<Text>No data available for this resource.</Text>}
-/>
+                />
+                <Link href="/farmers/farmermanager" asChild>
+                    <TouchableOpacity style={styles.floatingButton}>
+                        <MaterialIcons name="add" size={28} color="#fff" />
+                    </TouchableOpacity>
+                </Link>
 
             </View>
             
@@ -111,8 +110,9 @@ export default function FarmersList() {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#FFFFFF',
+        //backgroundColor: '#FFFFFF',
         flex:1,
+        marginBottom: 50
     },
     innerContainer:{
        width: wp('100%'), 
@@ -240,45 +240,24 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginTop: 2,
     },
-    categoriesContainer: {
-        backgroundColor: '#FFFFFF',
-        padding: 10,
-        flexDirection: 'row', 
-        flexWrap: 'wrap', 
-        justifyContent: 'space-between',
-        marginTop: 5,
-    },
-    categoryItem: {
-        paddingVertical:5 ,
-        paddingHorizontal: 5,
-        backgroundColor: "#EDEDF0",
-        borderRadius:70,
-        marginVertical:10
-    },
-    categoryText: {
-        fontSize: 10,
-        color: '#333333',
-    },
-    menuContainer: {
-        backgroundColor: "#fff",
-        borderRadius: 8,
-        marginTop: 5,
-        paddingVertical: 5,
-        borderWidth: 1,
-        borderColor: "#ddd",
-        shadowColor: "#000",
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-        elevation: 3,
-    },
-    menuItem: {
-        paddingVertical: 10,
-        paddingHorizontal: 15,
-    },
-    menuText: {
-        fontSize: 14,
-        color: "#333",
-    },
+    floatingButton: {
+        position: 'absolute',
+        bottom: hp('4%'), // Adjust as needed
+        right: wp('5%'),
+        backgroundColor: '#36813A',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+      },
+      
+    
 });
 
 

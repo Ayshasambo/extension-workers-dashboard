@@ -6,7 +6,7 @@
       iconName:"pets", 
       lga: "Misau",
       state: "Bauchi",
-      distance: '1800km',
+      distance: '1800',
       email:"aishamsambo@gmail.com",
       worktype:"extension worker",
       vaccination: [
@@ -19,7 +19,7 @@
           animalType: 'Goats'
         },
         {
-          diseaseType: 'NewCatle',
+          diseaseType: 'NewCastle',
           count: 25,
           status: 'Needs update',
           nextDue: 'Oct 30, 2025',
@@ -86,7 +86,7 @@
       lga: "Zaria",
       state: "Kaduna",
       //livestock: ['Cow', 'Chickens' ],
-      distance: '200km',
+      distance: '200',
       email:"aishamsambo@gmail.com",
       worktype:"extension worker",
       vaccination: [
@@ -148,7 +148,7 @@
         title: "Ahmad Muhammad",
         lga: "Zaria",
         state: "Kafanchan",
-        distance: '200km',
+        distance: '200',
         email:"aishamsambo@gmail.com",
         worktype:"extension worker",
         vaccination: [
@@ -210,7 +210,7 @@
         title: "Kallamu Yahya Yunusa",
         lga: "kankara",
         state: "Katsina",
-        distance: '200km',
+        distance: '200',
         email:"aishamsambo@gmail.com",
         worktype:"extension worker",
         vaccination: [
@@ -272,7 +272,7 @@
         title: "Larai Jibril",
         lga: "Gwagwalada",
         state: "Abuja",
-        distance: '200km',
+        distance: '200',
         email:"aishamsambo@gmail.com",
         worktype:"extension worker",
         vaccination: [
@@ -334,7 +334,7 @@
         title: "Aisha Sambo",
         lga: "Zaria",
         state: "Kaduna",
-        distance: '200km',
+        distance: '200',
         email:"aishamsambo@gmail.com",
         worktype:"extension worker",
         vaccination: [
@@ -397,7 +397,7 @@
         lga: "Zaria",
         state: "Kaduna",
         //livestock: ['Cow', 'Chickens' ],
-        distance: '200km',
+        distance: '200',
         email:"aishamsambo@gmail.com",
         worktype:"extension worker",
         livestock: [
@@ -456,7 +456,7 @@
         lga: "Zaria",
         state: "Kaduna",
         //livestock: ['Cow', 'Chickens' ],
-        distance: '200km',
+        distance: '200',
         email:"aishamsambo@gmail.com",
         worktype:"extension worker",
         livestock: [
@@ -485,29 +485,118 @@ export const states = ["Zamfara", "Kebbi", "Kaduna", "Kano", "Katsina"];
 export const workTypes = ["Farmer","Extension Worker","Veterinary Doctor"
 ];
 
-export const livestock = [
+export const extensionWorker = {
+  id: 1,
+  name: "Buhari Zailani",
+  email: "bz@gmail.com",
+  phone: "08012345678",
+  lga: "Zaria",
+  state: "Kaduna",
+  worktype: "Extension Worker"
+};
+
+export const notifications = [
   {
     id: 1,
-    name: "goat",
-    healthstatus:"99%",
-    weight:"50kg",
-    age:"24 months"
+    title: 'Disease Outbreak Alert',
+    body: 'An outbreak of Foot and Mouth Disease (FMD) has been reported in Zaria and Kaduna affecting cattles around several grazing areas and livestock markets. The disease is highly contagious, leading to significant economic losses.',
+    affectedareas: ['Zaria', 'Kaduna'],
+    severity: 'High',
+    iconName: 'coronavirus',
+    category: 'disease',
+    date: '5th November, 2024',
+    lga: 'Zaria',
+    state: 'Kaduna',
+    action: 'Immediate Isolation'
   },
   {
     id: 2,
-    name: "goat",
-    healthstatus:"99%",
-    weight:"50kg",
-    age:"24 months"
+    title: 'Extreme Weather Alert',
+    body: 'An a extreme weather alert as a result of North East trade wind approaching from the Sahel Region',
+    affectedareas: ['Misau', 'Katagum'],
+    severity: 'Medium',
+    iconName: 'thunderstorm',
+    category: 'disease',
+    date: '12th October, 2024'
+  }
+]
+
+export const livestockList = [
+  {
+    id: 1,
+    farmerName: 'Yusuf Habu',
+    type: 'Goats',
+    count: 24,
+    breed: 'Boer',
+    averageWeight: '70kg',
+    averageAge: '2 years',
+    healthStatus: '20%',
+    state: 'Bauchi',
+    lga: 'Misau',
+  },
+  {
+    id: 2,
+    farmerName: 'Musa Bello',
+    type: 'Cattle',
+    count: 12,
+    breed: 'Sokoto Gudali',
+    averageWeight: '300kg',
+    averageAge: '4 years',
+    healthStatus: '90%',
+    state: 'Kaduna',
+    lga: 'Zaria',
   },
   {
     id: 3,
-    name: "goat",
-    healthstatus:"99%",
-    weight:"50kg",
-    age:"24 months"
-  }
-]
+    farmerName: 'Musa Bello',
+    type: 'Cows',
+    count: 12,
+    breed: 'Sokoto Gudali',
+    averageWeight: '300kg',
+    averageAge: '4 years',
+    healthStatus: '90%',
+    state: 'Kaduna',
+    lga: 'Zaria',
+  },
+  {
+    id: 4,
+    farmerName: 'Musa Bello',
+    type: 'Chicken',
+    count: 12,
+    breed: 'Sokoto Gudali',
+    averageWeight: '300kg',
+    averageAge: '4 years',
+    healthStatus: '90%',
+    state: 'Kaduna',
+    lga: 'Zaria',
+  },
+  {
+    id: 5,
+    farmerName: 'Musa Bello',
+    type: 'Pigs',
+    count: 12,
+    breed: 'Sokoto Gudali',
+    averageWeight: '300kg',
+    averageAge: '4 years',
+    healthStatus: '90%',
+    state: 'Kaduna',
+    lga: 'Zaria',
+  },
+];
+export const breeds = [
+  { id: 1, name: 'Boer Goat' },
+  { id: 2, name: 'Nigerian Dwarf' },
+  { id: 3, name: 'Alpine Goat' },
+  { id: 4, name: 'Saanen Goat' },
+];
+
+export const healthStatus = [
+  { id: 1, status: 'Healthy' },
+  { id: 2, status: 'Sick' },
+  { id: 3, status: 'In Treatment' },
+  { id: 4, status: 'Vaccinated' },
+];
+
 
 
   

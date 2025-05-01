@@ -4,64 +4,61 @@ import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons} from '@expo/vector-icons';
-import {farmers} from '@/constants/dummy'
-import NavMenu from '@/components/NavMenu'
+import {farmers, livestockList} from '@/constants/dummy'
 
-export default function FarmersList() {
-    const { id } = useLocalSearchParams(); 
+
+
+export default function LivestockList() {
     const [searchQuery, setSearchQuery] = useState('');
-    const router = useRouter();
-    //const [activeMenu, setActiveMenu] = useState("Details");
-    type MenuType = "Person" | "Pets" | "Hospital";
-    const [activeMenu, setActiveMenu] = useState<MenuType>("Person");
-    const farmer = farmers.find((farmer) => farmer.id.toString() === id);
-    const farmerId = Array.isArray(id) ? Number(id[0]) : Number(id);
-    const filteredLivestock = farmer?.livestock?.filter((animal) =>
-        animal.type.toLowerCase().includes(searchQuery.toLowerCase())
-    ) || [];
-
-   const renderItem = ({ item }: any) => (
-         
+    const category = "LivestockList"; 
+    const dataMapping = {
+        "LivestockList": livestockList,
+    };
+    
+    const data = dataMapping[category] || [];
+    const filteredLivestock = data.filter((item) =>
+        item.type.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+   
+    const renderItem = ({ item }: any) => (
         <View style={styles.resourceContainer}>
-            <View style={styles.livestockCountContainer}>
-                <Text style={styles.livestockCountText}>
-                    {item.count} {item.type}
-                </Text>
-                <TouchableOpacity onPress={() => console.log("More options tapped")}>
-                  <MaterialIcons name="more-vert" size={24} color="#168543" />
-                </TouchableOpacity> 
-            </View>
-
-            <View style={styles.livestockInfoContainer}>
-                <View style={styles.healthItemContainer}>
-                <View style={styles.healthItem}>
-                        <Text style={styles.healthValue}>{item.healthStatus}</Text>
-                    </View> 
-                    <Text style={styles.infoLabel}>Health</Text>
-                </View>
-            
-                <View style={styles.infoItem}>
-                    <Text style={styles.infoValue}>{item.breed}</Text>
-                    <Text style={styles.infoLabel}>Breed</Text>
-                </View> 
-                <View style={styles.infoItem}>
-                    <Text style={styles.infoValue}>{item.averageWeight}</Text>
-                    <Text style={styles.infoLabel}>Weight</Text>
-                </View>
-                <View style={styles.infoItem}>
-                    <Text style={styles.infoValue}>{item.averageAge}</Text>
-                    <Text style={styles.infoLabel}>Age</Text>
-                </View>    
-            </View>   
+        <View style={styles.livestockCountContainer}>
+            <Text style={styles.livestockCountText}>
+                {item.count} {item.type}
+            </Text>
+            <TouchableOpacity onPress={() => console.log("More options tapped")}>
+              <MaterialIcons name="more-vert" size={24} color="#168543" />
+            </TouchableOpacity> 
         </View>
+
+        <View style={styles.livestockInfoContainer}>
+            <View style={styles.healthItemContainer}>
+            <View style={styles.healthItem}>
+                    <Text style={styles.healthValue}>{item.healthStatus}</Text>
+                </View> 
+                <Text style={styles.infoLabel}>Health</Text>
+            </View>
+        
+            <View style={styles.infoItem}>
+                <Text style={styles.infoValue}>{item.breed}</Text>
+                <Text style={styles.infoLabel}>Breed</Text>
+            </View> 
+            <View style={styles.infoItem}>
+                <Text style={styles.infoValue}>{item.averageWeight}</Text>
+                <Text style={styles.infoLabel}>Weight</Text>
+            </View>
+            <View style={styles.infoItem}>
+                <Text style={styles.infoValue}>{item.averageAge}</Text>
+                <Text style={styles.infoLabel}>Age</Text>
+            </View>    
+        </View>   
+    </View>
     );
  
     return (
         <View style={styles.container}>
-             <NavMenu activeMenu={activeMenu} setActiveMenu={setActiveMenu} farmerId={farmerId} />
             <View style={styles.innerContainer}>
-            
-            <View style={styles.searchContainer}>
+                <View style={styles.searchContainer}>
                     <MaterialIcons name="search" size={24} color="#5F6368" style={styles.searchIcon} />
                     <TextInput
                         style={styles.searchBar}
@@ -70,13 +67,18 @@ export default function FarmersList() {
                         onChangeText={setSearchQuery}
                     /> 
                 </View>
-
                 <FlatList
                     data={filteredLivestock}
                     renderItem={renderItem}
-                    keyExtractor={(_, index) => index.toString()}
-                    ListEmptyComponent={<Text>No livestock found.</Text>}
+                    keyExtractor={(item) => item.id.toString()}
+                    ListEmptyComponent={<Text>No data available for this resource.</Text>}
                 />
+                <Link href="/livestock/livestockmanager" asChild>
+                    <TouchableOpacity style={styles.floatingButton}>
+                        <MaterialIcons name="add" size={28} color="#fff" />
+                    </TouchableOpacity>
+                </Link>
+
             </View>
             
         </View>
@@ -85,10 +87,9 @@ export default function FarmersList() {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#FFFFFF',
+        //backgroundColor: '#FFFFFF',
         flex:1,
-        marginBottom:50,
-        alignItems:'center'
+        marginBottom: 50
     },
     innerContainer:{
        width: wp('100%'), 
@@ -198,9 +199,23 @@ const styles = StyleSheet.create({
         color: '#7F8C8D',
         fontWeight: 400,
       },
+      floatingButton: {
+        position: 'absolute',
+        bottom: hp('4%'), // Adjust as needed
+        right: wp('5%'),
+        backgroundColor: '#36813A',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+      },
 });
-
-
 
 
 

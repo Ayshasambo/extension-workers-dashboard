@@ -46,7 +46,7 @@ export default function TabLayout() {
           ),
         }}
       />
-{/*       
+      
       <Tabs.Screen
         name="livestock"
         options={{
@@ -56,7 +56,7 @@ export default function TabLayout() {
             <MaterialIcons name="pets" size={24} color={focused ? COLORS.white : COLORS.white} />
           ),
         }}
-      /> */}
+      />
 
       <Tabs.Screen
         name="farmers"

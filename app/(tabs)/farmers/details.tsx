@@ -8,11 +8,14 @@ import NavMenu from '@/components/NavMenu'
 export default function FarmerDetail() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const [activeMenu, setActiveMenu] = useState("Details");
+  //const [activeMenu, setActiveMenu] = useState("Details");
+  type MenuType = "Person" | "Pets" | "Hospital";
+  const [activeMenu, setActiveMenu] = useState<MenuType>("Person");
   const farmerId = Array.isArray(id) ? Number(id[0]) : Number(id);
   const farmer = farmers.find((f) => f.id.toString() === id);
   const [selectedState, setSelectedState] = useState(farmer?.state || '');
   const [selectedWorkType, setSelectedWorkType] = useState(farmer?.worktype || '');
+
 
   if (!farmer) {
     return (
@@ -24,7 +27,6 @@ export default function FarmerDetail() {
 
   return (
     <View style={styles.container}>
-      {/* ✅ Reusable Navigation */}
       <NavMenu activeMenu={activeMenu} setActiveMenu={setActiveMenu} farmerId={farmerId} />
 
       <View style={styles.imageContainer}>

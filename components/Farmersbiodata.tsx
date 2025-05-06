@@ -1,25 +1,121 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, ScrollView, } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { farmers, workTypes, states } from '@/constants/dummy';
-import { Picker } from '@react-native-picker/picker';
+import { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { useLocalSearchParams } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useUpdateById } from '@/hooks/useUpdate'; 
+import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
-const defaultImage = {img: require('@/assets/images/cows.jpg')}
+//rconst defaultImage = {img: require('./../../../assets/images/cow.jpg') }
 
+type Farmer = {
+  _id: string;
+  fullName: string;
+  gender: string;
+  dateOfBirth: string;
+  phone: string;
+  nationalIdNumber: string;
+  email: string;
+  role: string;
+  district:string | { _id: string; name: string };
+};
 
-type Farmer = (typeof farmers)[0];
-type BiodataProps = {
+type District = {
+  _id: string;
+  name: string;
+};
+
+type FarmersBiodataProps = {
   farmer: Farmer;
 };
 
-export default function Details({ farmer }: BiodataProps) {
+export default function FarmersBiodata({ farmer }: FarmersBiodataProps) {
+  const { id } = useLocalSearchParams();
+  const farmerId = Array.isArray(id) ? Number(id[0]) : Number(id);
+
   const [image, setImage] = useState<string | null>(null);
-  const [name, setName] = useState(farmer.title);
-  const [email, setEmail] = useState(farmer.email);
-  const [selectedState, setSelectedState] = useState(farmer.state || '');
-  const [selectedWorkType, setSelectedWorkType] = useState(farmer.worktype || '');
+  const [fullName, setFullName] = useState(farmer.fullName || '');
+  const [gender, setGender] = useState(farmer.gender || '');
+  const [dateOfBirth, setDateOfBirth] = useState(farmer.dateOfBirth || '');
+  const [phone, setPhone] = useState(farmer.phone || '');
+  const [nationalIdNumber, setNationalIdNumber] = useState(farmer.nationalIdNumber || '');
+  const [email, setEmail] = useState(farmer.email || '');
+  const [districtId, setDistrictId] = useState(
+    typeof farmer.district === 'object' && farmer.district !== null
+    ? farmer.district._id
+    : farmer.district || ''
+  );//useState(farmer.district || '');
+  const [role, setRole] = useState(farmer.role || 'farmer');
+  const [districts, setDistricts] = useState<District[]>([]);
+
+  const { mutate: updateFarmer } = useUpdateById<Farmer>('farmers');
+  useEffect(() => {
+    fetch('https://l-press-backend.onrender.com/districts')
+      .then((res) => res.json())
+      .then((data) => setDistricts(data))
+      .catch((err) => console.error('Failed to fetch districts:', err));
+  }, []);
+
+  const handleSubmit = () => {
+    const selectedDistrict = districts.find(d => d._id === districtId);
+  
+    const payload = {
+      fullName,
+      gender,
+      dateOfBirth,
+      phone,
+      nationalIdNumber,
+      email,
+      role,
+      ...(selectedDistrict && { district: selectedDistrict }),
+    };
+  
+    console.log('Submitting update for farmer ID:', farmer._id);
+    console.log('Payload:', payload);
+  
+    updateFarmer(
+      {
+        id: farmer._id,
+        data: payload,
+      },
+      {
+        onSuccess: () => {
+          console.log('Update success for farmer ID:', farmer._id);
+          Alert.alert('Success', 'Farmer updated successfully');
+        },
+        onError: (err: any) => {
+          console.error('Update failed:', err);
+          Alert.alert('Error', err?.response?.data?.message || 'Update failed');
+        },
+      }
+    );
+  };
+  
+
+  // const handleSubmit = () => {
+  //   updateFarmer(
+  //     {
+  //       id: farmer._id,
+  //       data: {
+  //         fullName,
+  //         gender,
+  //         dateOfBirth,
+  //         phone,
+  //         nationalIdNumber,
+  //         email,
+  //         role,
+  //         ...(districtId && { district: districtId }),
+  //       },
+  //     },
+      
+  //     {
+  //       onSuccess: () => Alert.alert('Success', 'Farmer updated successfully'),
+  //       onError: (err: any) => Alert.alert('Error', err?.response?.data?.message || 'Update failed'),
+  //     }
+  //   );
+  // };
+  
 
   return (
     <ScrollView style={styles.container}>
@@ -28,38 +124,39 @@ export default function Details({ farmer }: BiodataProps) {
       </View>
 
       <View style={styles.formContainer}>
-        <Text style={styles.label}>Name</Text>
-        <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Name" />
+        <Text style={styles.label}>Full Name</Text>
+        <TextInput style={styles.input} value={fullName} onChangeText={setFullName}  />
 
         <Text style={styles.label}>Email</Text>
-        <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Name" />
+        <TextInput style={styles.input} value={email} onChangeText={setEmail}  />
 
-        <Text style={styles.label}>State</Text>
+        <Text style={styles.label}>Gender</Text>
+        <TextInput style={styles.input} value={gender} onChangeText={setGender}  />
+
+        <Text style={styles.label}>Date of Birth</Text>
+        <TextInput style={styles.input} value={dateOfBirth} onChangeText={setDateOfBirth}  />
+
+        <Text style={styles.label}>Phone Number</Text>
+        <TextInput style={styles.input} value={phone} onChangeText={setPhone}  />
+
+        <Text style={styles.label}>National ID Number</Text>
+        <TextInput style={styles.input} value={nationalIdNumber} onChangeText={setNationalIdNumber} />
+
+        <Text style={styles.label}>District</Text>
         <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={selectedState}
-            onValueChange={(itemValue) => setSelectedState(itemValue)}
-            style={styles.picker}
-          >
-            {states.map((state, index) => (
-              <Picker.Item key={index} label={state} value={state} />
-            ))}
-          </Picker>
-        </View>
+        <Picker
+        selectedValue={districtId}
+        onValueChange={(itemValue) => setDistrictId(itemValue)}
+        style={styles.picker}
+      >
+        <Picker.Item label="Select District(Optional)" value="" />
+        {districts.map((dist) => (
+          <Picker.Item key={dist._id} label={dist.name} value={dist._id} />
+        ))}
+      </Picker>
+      </View> 
 
-        <Text style={styles.label}>Work Type</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={selectedWorkType}
-            onValueChange={(itemValue) => setSelectedWorkType(itemValue)}
-            style={styles.picker}
-          >
-            {workTypes.map((work, index) => (
-              <Picker.Item key={index} label={work} value={work} />
-            ))}
-          </Picker>
-        </View>
-
+      <Text style={styles.label}>Upload photo</Text>
         <TouchableOpacity style={styles.uploadField} onPress={async () => {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== 'granted') {
@@ -80,9 +177,12 @@ export default function Details({ farmer }: BiodataProps) {
             <Text style={styles.placeholder}>Upload Photo</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.updateButton} onPress={() => console.log("Update button pressed")}>
+        {/* <TouchableOpacity style={styles.updateButton} onPress={() => console.log("Update button pressed")}>
           <Text style={styles.updateButtonText}>Update</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <TouchableOpacity style={styles.updateButton} onPress={handleSubmit}>
+  <Text style={styles.updateButtonText}>Update</Text>
+</TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -91,9 +191,9 @@ export default function Details({ farmer }: BiodataProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFFFFF',
     paddingVertical: 20,
-    backgroundColor: '#F7F7FA',
+    //backgroundColor: '#F7F7FA',
   },
   imageContainer: {
     width: 120,

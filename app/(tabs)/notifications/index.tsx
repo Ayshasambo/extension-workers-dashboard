@@ -6,30 +6,33 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { notifications } from '@/constants/dummy';
 import { COLORS } from '../../../constants/theme';
 import { useRouter } from 'expo-router';
+import { useData } from '@/hooks/useData';
+import moment from 'moment';
 
 
 interface NotificationItem {
-    id: number;
+    _id: string;
     iconName: keyof typeof MaterialIcons.glyphMap;
     title: string;
-    body: string;
-    affectedareas: string[];
-    date: string;
-    severity: 'High' | 'Medium' | 'Low';
-    lga: string;
-    state: string;
-    action: string
+    description: string;
+    affectedPlaces: string[];
+    type: string;
+    severity: 'high' | 'moderate' | 'low';
+    status: string;
+    category:  string;
+    updatedAt: string
 }
 
 export default function Notifications() {
     const router = useRouter();
+    const { data, isLoading, error } = useData<NotificationItem[]>('/alerts');
     const getIconStyle = (severity: NotificationItem['severity']) => {
         switch (severity) {
-            case 'High':
+            case 'high':
                 return { backgroundColor: '#FFCCCC', iconColor: '#D32F2F' };
-            case 'Medium':
+            case 'moderate':
                 return { backgroundColor: '#FFF3E0', iconColor: '#FFA000' };
-            case 'Low':
+            case 'low':
                 return { backgroundColor: '#DDEEDE', iconColor: '#388E3C' };
             default:
                 return { backgroundColor: '#EDEDF0', iconColor: '#36813A' };
@@ -41,14 +44,14 @@ export default function Notifications() {
             pathname: '/(tabs)/notifications/details',
             params: {
                 title: item.title,
-                body: item.body,
-                date: item.date,
+                body: item.description,
                 iconName: item.iconName,
-                affectedAreas: item.affectedareas,
+                affectedPlaces: item.affectedPlaces,
                 severity: item.severity,
-                state: item.state,
-                lga: item.lga,
-                action: item.action
+                status: item.status,
+                category: item.category,
+                updatedAt: item.updatedAt
+
             },
         });
     };
@@ -60,20 +63,20 @@ export default function Notifications() {
         return (
             <TouchableOpacity style={styles.resourceContainer} onPress={() => handleNavigate(item)}>
                 <View style={[styles.leftIconContainer, { backgroundColor }]}>
-                    <MaterialIcons name={item.iconName} size={30} color={iconColor} />
+                    <MaterialIcons name={item.type === "disease" ? "coronavirus" : "thunderstorm"} size={30} color={iconColor} />
                 </View>
 
                 <View style={styles.textContainer}>
                     <View style={styles.titleContainer}>
-                        <Text style={styles.title}>{item.title}</Text>
+                        <Text style={styles.title}>Disease Outbreak Alert</Text>
                     </View>
 
                     <View style={styles.subTitleContainer}>
-                        <Text style={styles.subTitle} numberOfLines={1}>{item.body}</Text>
+                        <Text style={styles.subTitle} numberOfLines={1}>{item.description}</Text>
                     </View>
 
                     <View style={styles.characteristicsContainer}>
-                        {item.affectedareas.map((area, index) => (
+                        {item.affectedPlaces.map((area, index) => (
                             <View key={index} style={styles.characteristicsBox}>
                                 <Text style={styles.characteristics} numberOfLines={2} ellipsizeMode="tail">{area}</Text>
                             </View>
@@ -84,7 +87,7 @@ export default function Notifications() {
                 <View style={styles.distanceIconContainer}>
                     <View style={styles.distanceItem}>
                         <MaterialIcons name="arrow-forward-ios" size={25} color="#5F6368" />
-                        <Text style={styles.datetext}>{item.date}</Text>
+                        <Text style={styles.datetext}>{moment(item.updatedAt).format('MMMM Do YYYY')}</Text>
                     </View>
                 </View>
             </TouchableOpacity>
@@ -95,9 +98,9 @@ export default function Notifications() {
         <View style={styles.container}>
             <View style={styles.innerContainer}>
                 <FlatList
-                    data={notifications as NotificationItem[]}
+                    data={data as NotificationItem[]}
                     renderItem={renderItem}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item._id}
                     ListEmptyComponent={<Text>No Notifications available</Text>}
                 />
             </View>

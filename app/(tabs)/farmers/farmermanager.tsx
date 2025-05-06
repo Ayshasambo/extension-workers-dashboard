@@ -1,69 +1,147 @@
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import React, { useState } from 'react';
-import { useLocalSearchParams } from 'expo-router';
-import { livestockList, breeds, healthStatus, farmers, workTypes} from '@/constants/dummy'
+import React, { useState, useEffect } from 'react';
 import { Picker } from '@react-native-picker/picker';
-// import * as ImagePicker from 'expo-image-picker';
-// const defaultImage = {img: require('./../../../assets/images/cow.jpg') }
+import { usePostData } from '@/hooks/usePostData';
+import AppButton from '@/components/AppButton'; 
+import { COLORS } from '@/constants/theme';
+import axios from 'axios'
 
 
-export default function Profile() {
-  const { id } = useLocalSearchParams();
-  const farmerId = Array.isArray(id) ? Number(id[0]) : Number(id);
-  const farmer = farmers.find((f) => f.id === farmerId);
-  const [livestock, setLivestock] = useState(livestockList[0]?.type || '');
-  const [farmingtype, setFarmingtype] = useState('');
-  const [nin, setNin] = useState('');
-  const [phone, setPhone] = useState('');
-  const [dob, setDob] = useState('');
-  const [name, setName] = useState('');
-  const [gender, setGender] = useState('');
-  const [livestockcount, setLivestockcount] = useState('');
-  
-  const handleSave = () => {
-    //console.log('Updated info:', { name, email, phone, lga, state });
+type District = {
+    _id: string;
+    name: string;
   };
+
+  interface farmers{
+    //_id:string
+    fullName: string,
+    gender: string,
+    dateOfBirth: string,
+    phone: string,
+    nationalIdNumber: string,
+    email: string,
+    district: string,
+    role: string
+  }
+
+export default function AddFarmer() {
+    
+  const [fullName, setFullName] = useState('');
+  const [gender, setGender] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [phone, setPhone] = useState('');
+  const [nationalIdNumber, setNationalIdNumber] = useState('');
+  const [email, setEmail] = useState('');
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [districtId, setDistrictId] = useState('');
+  const [role, setRole] = useState('farmer');
+  
+
+  //const { mutate: addFarmer, isPending } = useAddFarmer();
+  const { mutate, isPending, isSuccess, isError } = usePostData<any, farmers>('/farmers');
+
+  useEffect(() => {
+    axios.get('https://l-press-backend.onrender.com/districts')
+      .then((res) => setDistricts(res.data))
+      .catch((err) => console.error('Failed to fetch districts:', err));
+  }, []);
+
+//   const handleSave = () => {
+//     if (!fullName || !gender || !dateOfBirth || !phone || !nationalIdNumber ) {
+//       alert('Please fill all required fields');
+//       return;
+//     }
+
+const handleSave = () => {
+    mutate({
+      //id,
+      fullName,
+      gender,
+      dateOfBirth,
+      phone,
+      nationalIdNumber,
+      email,
+      district:districtId,
+      role
+    });
+  };
+    
+
+    // addFarmer({
+    //   fullName,
+    //   gender,
+    //   dateOfBirth,
+    //   phone,
+    //   nationalIdNumber,
+    //   email,
+    //   role,
+    //   ...(districtId && { district: districtId }),
+    // },
+    // {
+    //     onSuccess: () => {
+    //       Alert.alert('Success', 'Farmer added successfully!');
+    //       setFullName('');
+    //       setGender('');
+    //       setDateOfBirth('');
+    //       setPhone('');
+    //       setNationalIdNumber('');
+    //       setEmail('');
+    //       setDistrictId('');
+    //       setRole('farmer');
+    //     },
+    //     onError: (error) => {
+    //       console.error('Error adding farmer:', error);
+    //       Alert.alert('Error', 'Failed to add farmer');
+    //     }
+    //   });
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-
-      {/* <View style={styles.titleContainer}>
-        <Text style={styles.title}>{farmer.title}</Text>
-      </View> */}
-        <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Full name" />
-        <TextInput style={styles.input} value={gender} onChangeText={setGender} placeholder="Gender" />
-        {/* <TextInput style={styles.input} value={dob} onChangeText={setDob} placeholder="Date of birth" /> */}
-        <View style={styles.dobIcon}>
-            <MaterialIcons name="calendar-today" size={24} color="#888" style={styles.dobicon} />
-            <TextInput
-                style={styles.dobinput}
-                value={dob}
-                onChangeText={setDob}
-                placeholder="Date of birth"
-            />
-        </View>
-        <TextInput style={styles.input} value={phone} onChangeText={setPhone} placeholder="Phone number" keyboardType="phone-pad" />
-        <TextInput style={styles.input} value={nin} onChangeText={setNin} placeholder="Nin" keyboardType="email-address" />
+      <TextInput style={styles.input} value={fullName} onChangeText={setFullName} placeholder="Full name" />
+      <TextInput style={styles.input} value={gender} onChangeText={setGender} placeholder="Gender" />
+      <View style={styles.dobIcon}>
+        <MaterialIcons name="calendar-today" size={24} color="#888" style={styles.dobicon} />
+        <TextInput
+          style={styles.dobinput}
+          value={dateOfBirth}
+          onChangeText={setDateOfBirth}
+          placeholder="Date of birth (YYYY-MM-DD)"
+        />
+      </View>
+      <TextInput style={styles.input} value={phone} onChangeText={setPhone} placeholder="Phone number" keyboardType="phone-pad" />
+      <TextInput style={styles.input} value={nationalIdNumber} onChangeText={setNationalIdNumber} placeholder="NIN" />
+      <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Email (optional)" />
+      
         <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={livestock}
-            onValueChange={(itemValue) => setLivestock(itemValue)}
-            style={styles.picker}
-          >
-            {livestockList.map((item, index) => (
-              <Picker.Item key={index} label={item.type} value={item.type} />
-            ))}
-          </Picker>
-        </View>
-        <TextInput style={styles.input} value={livestockcount} onChangeText={setLivestockcount} placeholder="Livestock count"  />
+        <Picker
+        selectedValue={districtId}
+        onValueChange={(itemValue) => setDistrictId(itemValue)}
+        style={styles.picker}
+      >
+        <Picker.Item label="Select District(Optional)" value="" />
+        {districts.map((dist) => (
+          <Picker.Item key={dist._id} label={dist.name} value={dist._id} />
+        ))}
+      </Picker>
+      </View>
+      <AppButton
+        label={isPending ? 'Saving...' : isSuccess ? 'Saved ✅' : 'Submit'}
+        onPress={handleSave}
+        backgroundColor={COLORS.primary}
+        color="#fff"
+      />
 
-        <TouchableOpacity style={styles.button} onPress={handleSave}>
-            <Text style={styles.buttonText}>Update</Text>
-        </TouchableOpacity>
+      {isError && <Text style={styles.error}>Failed to save. Please try again.</Text>}
+
+      {/* <TouchableOpacity style={styles.button} onPress={handleSave} disabled={isPending}>
+        <Text style={styles.buttonText}>{isPending ? 'Saving...' : 'Add Farmer'}</Text>
+      </TouchableOpacity> */}
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -122,6 +200,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-
+  error: {
+    color: 'red',
+    marginTop: 10,
+  },
   
 });

@@ -5,26 +5,55 @@ import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialIcons} from '@expo/vector-icons';
 import {farmers, livestockList} from '@/constants/dummy'
+//import { useAnimals} from '../../../hooks/useGetLivestocks'; 
+import { useData} from '../../../hooks/useData'; 
 
+interface animals{
+    _id: string;
+    type: string,
+    breed: string,
+    age: number,
+    weight: number,
+    healthStatus: string,
+    farmer: string,
+    identifier: string,
+  vaccinationHistory: [
+    string
+  ],
+  isInBreedingCycle: boolean,
+  expectedBreedingDate: string,
+  isVaccinated: boolean,
+  nextVaccinationDate: string,
+  lastHealthCheckDate: string,
+  healthIssues: [
+    string
+  ],
+  isAlive: boolean,
+  region: string
+}
 
 
 export default function LivestockList() {
     const [searchQuery, setSearchQuery] = useState('');
-    const category = "LivestockList"; 
-    const dataMapping = {
-        "LivestockList": livestockList,
-    };
+    //const { data: animals, isLoading } = useAnimals();
+    const { data:animals=[], isLoading, error } = useData<animals[]>('/animals')
+    // const category = "LivestockList"; 
+    // const dataMapping = {
+    //     "LivestockList": livestockList,
+    // };
     
-    const data = dataMapping[category] || [];
-    const filteredLivestock = data.filter((item) =>
-        item.type.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // const data = dataMapping[category] || [];
+    const filteredData = animals.filter((animal) =>
+     animal.type.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
    
     const renderItem = ({ item }: any) => (
         <View style={styles.resourceContainer}>
         <View style={styles.livestockCountContainer}>
             <Text style={styles.livestockCountText}>
-                {item.count} {item.type}
+                {/* {item.count} {item.type} */}
+                {item.type}
             </Text>
             <TouchableOpacity onPress={() => console.log("More options tapped")}>
               <MaterialIcons name="more-vert" size={24} color="#168543" />
@@ -32,23 +61,21 @@ export default function LivestockList() {
         </View>
 
         <View style={styles.livestockInfoContainer}>
-            <View style={styles.healthItemContainer}>
-            <View style={styles.healthItem}>
-                    <Text style={styles.healthValue}>{item.healthStatus}</Text>
-                </View> 
+            <View style={styles.infoItem}>
+                <Text style={styles.infoValue}>{item.healthStatus}</Text>
                 <Text style={styles.infoLabel}>Health</Text>
-            </View>
+            </View> 
         
             <View style={styles.infoItem}>
                 <Text style={styles.infoValue}>{item.breed}</Text>
                 <Text style={styles.infoLabel}>Breed</Text>
             </View> 
             <View style={styles.infoItem}>
-                <Text style={styles.infoValue}>{item.averageWeight}</Text>
+                <Text style={styles.infoValue}>{item.weight}</Text>
                 <Text style={styles.infoLabel}>Weight</Text>
             </View>
             <View style={styles.infoItem}>
-                <Text style={styles.infoValue}>{item.averageAge}</Text>
+                <Text style={styles.infoValue}>{item.age}</Text>
                 <Text style={styles.infoLabel}>Age</Text>
             </View>    
         </View>   
@@ -68,9 +95,9 @@ export default function LivestockList() {
                     /> 
                 </View>
                 <FlatList
-                    data={filteredLivestock}
+                    data={filteredData}
                     renderItem={renderItem}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item._id}
                     ListEmptyComponent={<Text>No data available for this resource.</Text>}
                 />
                 <Link href="/livestock/livestockmanager" asChild>
@@ -151,7 +178,7 @@ const styles = StyleSheet.create({
     },
     livestockCountText: {
         fontWeight: 'bold',
-        fontSize: 12,
+        fontSize: 16,
         color: '#00796b',
         backgroundColor: '#EDEDF0',
         padding: 5,
@@ -162,7 +189,7 @@ const styles = StyleSheet.create({
         padding:6,
         borderRadius: 8,
         alignSelf: 'flex-start',
-        gap:30,
+        gap:20,
     },
     healthItemContainer: {
         alignItems: 'center',

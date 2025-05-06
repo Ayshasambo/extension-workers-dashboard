@@ -1,36 +1,63 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity } from 'react-native';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { farmers } from '@/constants/dummy';
+import { useDataWithQuery } from '@/hooks/useDateWithQuery';
+import { useLocalSearchParams } from 'expo-router';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+
+type Animal = {
+  _id:string,
+  type: string;
+  breed: string;
+  age: number;
+  weight: number;
+  healthStatus: string;
+  farmer: string;
+  identifier: string;
+  vaccinationHistory: string[];
+  isInBreedingCycle: boolean;
+  expectedBreedingDate: string;
+  isVaccinated: boolean;
+  nextVaccinationDate: string;
+  lastHealthCheckDate: string;
+  healthIssues: string[];
+  isAlive: boolean;
+  region: string;
+};
 
 type LivestockProps = {
-    farmerId: number; 
-  };
-  
-  export default function Livestock({ farmerId }: LivestockProps) {
-    const [searchQuery, setSearchQuery] = useState('');
-    const farmer = farmers.find((farmer) => farmer.id === farmerId);
-    const filteredLivestock = farmer?.livestock?.filter((animal) =>
-      animal.type.toLowerCase().includes(searchQuery.toLowerCase())
-    ) || [];
+  farmerId: string;
+};
 
-  const renderItem = ({ item }: any) => (
+export default function Livestock({ farmerId }: LivestockProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+  console.log("Livestock - farmerId:", farmerId);
+
+  const { data: animals, isLoading, error } = useDataWithQuery<Animal[]>('animals', { farmer: farmerId });
+
+  const filteredAnimals = animals?.filter((animal) =>
+    animal.type.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
+
+  const renderItem = ({ item }: { item: Animal }) => (
     <View style={styles.resourceContainer}>
+
       <View style={styles.livestockCountContainer}>
-        <Text style={styles.livestockCountText}>
-          {item.count} {item.type}
-        </Text>
+        <Text style={styles.livestockCountText}>{item.type}</Text>
         <TouchableOpacity onPress={() => console.log("More options tapped")}>
           <MaterialIcons name="more-vert" size={24} color="#168543" />
         </TouchableOpacity>
       </View>
 
       <View style={styles.livestockInfoContainer}>
-        <View style={styles.healthItemContainer}>
+        {/* <View style={styles.healthItemContainer}>
           <View style={styles.healthItem}>
             <Text style={styles.healthValue}>{item.healthStatus}</Text>
           </View>
+          <Text style={styles.infoLabel}>Health</Text>
+        </View> */}
+        <View style={styles.infoItem}>
+          <Text style={styles.infoValue}>{item.healthStatus}</Text>
           <Text style={styles.infoLabel}>Health</Text>
         </View>
 
@@ -39,16 +66,19 @@ type LivestockProps = {
           <Text style={styles.infoLabel}>Breed</Text>
         </View>
         <View style={styles.infoItem}>
-          <Text style={styles.infoValue}>{item.averageWeight}</Text>
+          <Text style={styles.infoValue}>{item.weight} </Text>
           <Text style={styles.infoLabel}>Weight</Text>
         </View>
         <View style={styles.infoItem}>
-          <Text style={styles.infoValue}>{item.averageAge}</Text>
+          <Text style={styles.infoValue}>{item.age} </Text>
           <Text style={styles.infoLabel}>Age</Text>
         </View>
       </View>
     </View>
   );
+
+  if (isLoading) return <ActivityIndicator size="large" color="#168543" />;
+  if (error) return <Text>Failed to load livestock data.</Text>;
 
   return (
     <View style={styles.innerContainer}>
@@ -63,9 +93,9 @@ type LivestockProps = {
       </View>
 
       <FlatList
-        data={filteredLivestock}
+        data={filteredAnimals}
         renderItem={renderItem}
-        keyExtractor={(_, index) => index.toString()}
+        keyExtractor={(item) => item._id}
         ListEmptyComponent={<Text>No livestock found.</Text>}
       />
     </View>
@@ -77,6 +107,7 @@ const styles = StyleSheet.create({
        width: wp('100%'), 
        alignSelf:'center',
        marginTop:20,
+       marginBottom:50,
        flex:1
     },
     searchContainer: {
@@ -144,7 +175,7 @@ const styles = StyleSheet.create({
         padding:6,
         borderRadius: 8,
         alignSelf: 'flex-start',
-        gap:30,
+        gap:15,
     },
     healthItemContainer: {
         alignItems: 'center',
@@ -183,73 +214,4 @@ const styles = StyleSheet.create({
       },
 });
 
-// const styles = StyleSheet.create({
-//   innerContainer: {
-//     flex: 1,
-//     padding: wp('5%'),
-//     backgroundColor: '#fff',
-//   },
-//   searchContainer: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     backgroundColor: '#F1F3F4',
-//     borderRadius: 8,
-//     paddingHorizontal: 10,
-//     marginBottom: hp('2%'),
-//   },
-//   searchIcon: {
-//     marginRight: 10,
-//   },
-//   searchBar: {
-//     flex: 1,
-//     height: hp('6%'),
-//     fontSize: 16,
-//   },
-//   resourceContainer: {
-//     backgroundColor: '#f9f9f9',
-//     borderRadius: 10,
-//     padding: wp('4%'),
-//     marginBottom: hp('2%'),
-//     elevation: 2,
-//   },
-//   livestockCountContainer: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     marginBottom: hp('1.5%'),
-//   },
-//   livestockCountText: {
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//   },
-//   livestockInfoContainer: {
-//     flexDirection: 'row',
-//     flexWrap: 'wrap',
-//     justifyContent: 'space-between',
-//   },
-//   healthItemContainer: {
-//     alignItems: 'center',
-//     marginBottom: hp('1.5%'),
-//   },
-//   healthItem: {
-//     backgroundColor: '#168543',
-//     padding: 8,
-//     borderRadius: 5,
-//   },
-//   healthValue: {
-//     color: '#fff',
-//     fontWeight: 'bold',
-//   },
-//   infoItem: {
-//     width: '45%',
-//     marginBottom: hp('1.5%'),
-//   },
-//   infoValue: {
-//     fontWeight: 'bold',
-//     fontSize: 16,
-//   },
-//   infoLabel: {
-//     color: '#666',
-//     fontSize: 12,
-//   },
-// });
 

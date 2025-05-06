@@ -1,7 +1,7 @@
 
   export const farmers = [
     {
-      id: 1, 
+      id: "1", 
       title: "Yusuf Habu", 
       iconName:"pets", 
       lga: "Misau",
@@ -80,7 +80,7 @@
       
     },
     {
-      id: 2,
+      id: "2",
       iconName: "pets",
       title: "Aisha Sambo",
       lga: "Zaria",
@@ -143,7 +143,7 @@
       ]
     },
     {
-        id: 3,
+        id: "3",
         iconName: "pets",
         title: "Ahmad Muhammad",
         lga: "Zaria",
@@ -205,7 +205,7 @@
         ]
       },
       {
-        id: 4,
+        id: "4",
         iconName: "pets",
         title: "Kallamu Yahya Yunusa",
         lga: "kankara",
@@ -267,7 +267,7 @@
         ]
       },
       {
-        id: 5,
+        id: "5",
         iconName: "pets",
         title: "Larai Jibril",
         lga: "Gwagwalada",
@@ -329,7 +329,7 @@
         ]
       },
       {
-        id: 9,
+        id: "6",
         iconName: "pets",
         title: "Aisha Sambo",
         lga: "Zaria",
@@ -420,7 +420,7 @@
         ]
       },
       {
-        id: 7,
+        id: "7",
         iconName: "pets",
         title: "Aisha Sambo",
         lga: "Zaria",
@@ -450,7 +450,7 @@
 
       },
       {
-        id: 8,
+        id: "8",
         iconName: "pets",
         title: "Aisha Sambo",
         lga: "Zaria",
@@ -505,9 +505,6 @@ export const notifications = [
     iconName: 'coronavirus',
     category: 'disease',
     date: '5th November, 2024',
-    lga: 'Zaria',
-    state: 'Kaduna',
-    action: 'Immediate Isolation'
   },
   {
     id: 2,

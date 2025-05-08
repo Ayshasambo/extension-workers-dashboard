@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useData } from "@/hooks/useData";
 import moment from "moment";
+import { useLocation } from "@/context/LocationContext";
+import { useWeather } from "@/hooks/useWeather";
 
 type Animals = {
     identifier: string,
@@ -40,17 +42,37 @@ type Statistics = {
 }
 
 const Index = () => {
-    const {user} = useAuth()
     const { data:statistics, isLoading, error } = useData<Statistics>('/dashboard/statistics')
-    
+    const {location} = useLocation()
+    const { data: weather, isLoading: weatherLoading } = useWeather(
+        location?.latitude,
+        location?.longitude
+      );
     const vaccinationProgress = statistics?.vaccinationStatus?.percentage || 0;
-    const breedingAnimals = statistics?.breedingCycle?.animals
-
+    
     const formatDate = (date: string) => {
-
         return moment(date).format('MMMM Do YYYY')
     }
     
+    const getWeatherIcon = (condition: string) => {
+        switch (condition.toLowerCase()) {
+          case "clear":
+            return <MaterialIcons name="wb-sunny" size={60} color="white" />;
+          case "clouds":
+            return <MaterialIcons name="wb-cloudy" size={60} color="white" />;
+          case "rain":
+            return <MaterialCommunityIcons name="weather-rainy" size={60} color="white" />;
+          case "snow":
+            return <MaterialCommunityIcons name="weather-snowy" size={60} color="white" />;
+          case "thunderstorm":
+            return <MaterialCommunityIcons name="weather-lightning" size={60} color="white" />;
+          case "drizzle":
+            return <MaterialCommunityIcons name="weather-hail" size={60} color="white" />;
+          default:
+            return <MaterialIcons name="wb-cloudy" size={60} color="white" />;
+        }
+      };
+
     return (
         <ScrollView style={{ flex: 1, backgroundColor: COLORS.lightGray1, }}>
         
@@ -79,16 +101,16 @@ const Index = () => {
                     backgroundColor: '#FF512F', borderRadius: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
             
             <View>        
-                <Text style={{...FONTS.body2, color: COLORS.white}}> Bauchi </Text>
-                <Text style={{...FONTS.body3, color: COLORS.white}}> Cloudy </Text>        
+                <Text style={{...FONTS.body2, color: COLORS.white}}> {weather?.name || "Loading..."} </Text>
+                <Text style={{...FONTS.body3, color: COLORS.white}}> {weather?.weather[0].main} </Text>        
             </View>
 
             <View >        
-                <Text style={{...FONTS.body1, color: COLORS.white}}> 39°C </Text>        
+                <Text style={{...FONTS.body1, color: COLORS.white}}> {weather?.main.temp ? `${Math.round(weather.main.temp)}°C` : "--"} </Text>        
             </View>
 
             <View>  
-            <MaterialIcons name="wb-cloudy" size={60} color="white" />            
+            {weather ? getWeatherIcon(weather.weather[0].main) : null}            
             </View>
             
             </View>

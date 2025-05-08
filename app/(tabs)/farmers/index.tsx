@@ -20,15 +20,6 @@ interface farmers{
   role: string
 }
 
-// const dummyLivestockMap: Record<string, { type: string; count: number }[]> = {
-//   '6813b6f5f2834bb597394624': [
-//     { type: 'Goat', count: 5 },
-//     { type: 'Cow', count: 2 },
-//   ],
-//   'dummy-001': [
-//     { type: 'Chicken', count: 20 },
-//   ],
-// };
 
 export default function FarmersList() {
   const [searchQuery, setSearchQuery] = useState('');

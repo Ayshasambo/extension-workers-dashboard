@@ -11,6 +11,7 @@ export default function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false); 
   const router = useRouter();
   const { login } = useAuth();
 
@@ -28,13 +29,17 @@ export default function Login() {
 
 
   const handleLogin = async () => {
+    setLoading(true); 
     try {
-     await login({ email: email, password: password });
+      await login({ email, password });
       router.replace('/(tabs)');
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false); 
     }
   };
+
   return (
     <View style={{ backgroundColor: 'white', flex: 1 }}>
       
@@ -74,10 +79,11 @@ export default function Login() {
 
       <View style={{ alignItems: 'center', width: '90%', marginLeft: wp(5) }}>
         <AppButton
-          label="LOGIN"
+          label={loading ? 'Loading...' : 'LOGIN'}
            onPress={handleLogin}
           backgroundColor={COLORS.primary}
           color={COLORS.white}
+          disabled={loading}
         />
       </View>
 

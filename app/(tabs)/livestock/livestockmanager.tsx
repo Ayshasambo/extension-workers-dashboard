@@ -1,178 +1,18 @@
-// import { View, Text, TextInput, Button, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
-// import { MaterialIcons } from '@expo/vector-icons';
-// import React, { useState } from 'react';
-// import { useLocalSearchParams } from 'expo-router';
-// import { livestockList, breeds, healthStatus, farmers} from '@/constants/dummy'
-// import { Picker } from '@react-native-picker/picker';
-// // import * as ImagePicker from 'expo-image-picker';
-// // const defaultImage = {img: require('./../../../assets/images/cow.jpg') }
-
-
-
-// export default function Profile() {
-//   const { id } = useLocalSearchParams();
-//   const farmerId = Array.isArray(id) ? Number(id[0]) : Number(id);
-//   const farmer = farmers.find((f) => f.id === farmerId);
-//   const [livestock, setLivestock] = useState(livestockList[0]?.type || '');
-//   const [breed, setBreed] = useState(breeds[0]?.name || '');
-//   const [health, setHealth] = useState(healthStatus[0]?.status || '');
-//   const [age, setAge] = useState('');
-//   const [weight, setWeight] = useState('');
-  
-//   const handleSave = () => {
-//     //console.log('Updated info:', { name, email, phone, lga, state });
-//   };
-
-//   return (
-//     <ScrollView contentContainerStyle={styles.container}>
-
-//       {/* <View style={styles.titleContainer}>
-//         <Text style={styles.title}>{farmer.title}</Text>
-//       </View> */}
-//         <View style={styles.pickerContainer}>
-//         <Picker
-//             selectedValue={livestock}
-//             onValueChange={(itemValue) => setLivestock(itemValue)}
-//             style={styles.picker}
-//             >
-//             {livestockList.map((item, index) => (
-//                 <Picker.Item
-//                 key={index}
-//                 label={item.type} 
-//                 value={item.type} 
-//                 />
-//             ))}
-//         </Picker>
-//         </View>
-
-//         <View style={styles.pickerContainer}>
-//         <Picker
-//             selectedValue={breed}
-//             onValueChange={(itemValue) => setBreed(itemValue)}
-//             style={styles.picker}
-//             >
-//             {breeds.map((item, index) => (
-//                 <Picker.Item
-//                 key={index}
-//                 label={item.name} 
-//                 value={item.name} 
-//                 />
-//             ))}
-//         </Picker>
-//         </View>
-
-//         <TextInput style={styles.input} value={weight} onChangeText={setWeight} placeholder="Weight" />
-
-//         <View style={styles.pickerContainer}>
-//         <Picker
-//             selectedValue={health}
-//             onValueChange={(itemValue) => setHealth(itemValue)}
-//             style={styles.picker}
-//             >
-//             {healthStatus.map((item, index) => (
-//                 <Picker.Item
-//                 key={index}
-//                 label={item.status} 
-//                 value={item.status} 
-//                 />
-//             ))}
-//         </Picker>
-//         </View>
-
-//         <TextInput style={styles.input} value={age} onChangeText={setAge} placeholder="Age" />
-        
-
-//         <TouchableOpacity style={styles.button} onPress={handleSave}>
-//             <Text style={styles.buttonText}>Submit</Text>
-//         </TouchableOpacity>
-//     </ScrollView>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     padding: 20,
-//     gap: 10,
-//     marginTop:50
-//   },
-//   titleContainer:{
-//      backgroundColor:'green',
-//      alignSelf:"center",
-//      color:"white",
-//      width:"80%",
-//      fontSize:16
-//   },
-//   title: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     //marginBottom: 20,
-//     color:'white'
-//   },
-//   input: {
-//     borderWidth: 1,
-//     borderColor: '#ccc',
-//     borderRadius: 8,
-//     padding: 10,
-//     marginBottom: 15,
-//     backgroundColor: '#F7F7FA',
-//   },
-//   pickerContainer: {
-//     borderWidth: 1,
-//     borderColor: '#ccc',
-//     borderRadius: 8,
-//     overflow: 'hidden',
-//     marginBottom: 20,
-//     backgroundColor: '#F7F7FA',
-//   },
-//   picker: {
-//     height: 50,
-//     width: '100%',
-//   },
-//   label: {
-//     fontSize: 16,
-//     fontWeight: 'bold',
-//     marginBottom: 5,
-//   },
-//   uploadField: {
-//     borderWidth: 1,
-//     borderColor: '#ccc',
-//     borderRadius: 8,
-//     height: 50,
-//     paddingHorizontal: 12,
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginBottom: 16,
-//     //backgroundColor: '#f9f9f9',
-//   },
-//   placeholder: {
-//     marginLeft: 10,
-//     color: '#999',
-//     fontSize: 16,
-//   },
-//   button: {
-//     backgroundColor: '#36813A', 
-//     paddingVertical: 12,
-//     paddingHorizontal: 20,
-//     borderRadius: 10,
-//     alignItems: 'center',
-//     marginTop: 20,
-//   },
-//   buttonText: {
-//     color: 'white',
-//     fontSize: 16,
-//     fontWeight: 'bold',
-//   },
-
-// });
-
 import React, { useState } from 'react';
-import {View, Text,TextInput,TouchableOpacity,StyleSheet,ScrollView,Switch,} from 'react-native';
+import {View, Text,TextInput,TouchableOpacity,StyleSheet,ScrollView,Switch} from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { useLocalSearchParams } from 'expo-router';
-import AppButton from '@/components/AppButton'; // Adjust path if needed
+import AppButton from '@/components/AppButton'; 
 import { COLORS } from '@/constants/theme';
 import { usePostData } from '@/hooks/usePostData';
+import { useData } from '@/hooks/useData';
 
-interface Livestock{
+interface Farmer {
+  _id: string;
+  fullName: string;
+}
+
+interface Animals{
   type: string;
   breed: string;
   age: number;
@@ -194,7 +34,6 @@ interface Livestock{
 export default function LivestockManager() {
   const { id } = useLocalSearchParams();
   const farmerId = Array.isArray(id) ? id[0] : id;
-
   const [type, setType] = useState('');
   const [breed, setBreed] = useState('');
   const [age, setAge] = useState('');
@@ -207,20 +46,27 @@ export default function LivestockManager() {
   const [nextVaccinationDate, setNextVaccinationDate] = useState('');
   const [lastHealthCheckDate, setLastHealthCheckDate] = useState('');
   const [region, setRegion] = useState('');
+  //const [farmer, setFarmer] = useState('');
+  const [selectedFarmer, setSelectedFarmer] = useState<string | null>(null); 
   const [isInBreedingCycle, setIsInBreedingCycle] = useState(false);
   const [isVaccinated, setIsVaccinated] = useState(false);
   const [isAlive, setIsAlive] = useState(true);
 
-  const { mutate, isPending, isSuccess, isError } = usePostData<any, Livestock>('/animals');
+  const { mutate, isPending, isSuccess, isError } = usePostData<any, Animals>('/animals');
+  const { data: farmers = [] } = useData<Farmer[]>('/farmers');
 
   const handleSave = () => {
+    if (!selectedFarmer) {
+      alert("Please select a farmer.");
+      return;
+    }
     mutate({
       type,
       breed,
       age: Number(age),
       weight: Number(weight),
       healthStatus,
-      farmer: farmerId,
+      farmer: selectedFarmer, 
       identifier,
       vaccinationHistory: vaccinationHistory.split(',').map(s => s.trim()),
       isInBreedingCycle,
@@ -231,11 +77,34 @@ export default function LivestockManager() {
       healthIssues: healthIssues.split(',').map(s => s.trim()),
       isAlive,
       region,
+    }, {
+      onError: (error: any) => {
+        console.error("API Error:", error?.response?.data || error.message);
+        alert("Failed to save. Please try again.");
+      },
+      onSuccess: () => {
+        console.log("Livestock saved successfully!");
+      }
     });
-  };
+
+   };
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {/* <TextInput style={styles.input} placeholder="Farmer's name" value={farmer} onChangeText={setFarmer} /> */}
+      <View style={styles.pickerContainer}>
+      <Picker
+        selectedValue={selectedFarmer}
+        style={styles.picker}
+        onValueChange={(itemValue) => setSelectedFarmer(itemValue)}
+      >
+        <Picker.Item label="Select a farmer" value={null} />
+        {farmers.map((farmer: Farmer) => ( 
+          <Picker.Item key={farmer._id} label={farmer.fullName} value={farmer._id} />
+        ))}
+      </Picker>
+      </View>
       <TextInput style={styles.input} placeholder="Livestock" value={type} onChangeText={setType} />
       <TextInput style={styles.input} placeholder="Breed" value={breed} onChangeText={setBreed} />
       <TextInput style={styles.input} placeholder="Age" value={age} onChangeText={setAge} keyboardType="numeric" />
@@ -281,6 +150,22 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     paddingBottom: 100,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: '#F7F7FA',
+    marginBottom: 20,
+  },
+  picker: {
+    height: 50,
+    width: '100%',
   },
   input: {
     borderWidth: 1,

@@ -55,6 +55,7 @@ import 'react-native-reanimated';
 import { AuthProvider } from '@/context/AuthContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { LocationProvider } from '@/context/LocationContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -82,7 +83,9 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <LocationProvider>
         <Slot />
+        </LocationProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

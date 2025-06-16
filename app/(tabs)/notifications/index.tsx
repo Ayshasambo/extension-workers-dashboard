@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, ListRenderItem, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ListRenderItem, TouchableOpacity, ScrollView } from 'react-native';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { MaterialIcons } from '@expo/vector-icons';
 import { notifications } from '@/constants/dummy';
 import { COLORS } from '../../../constants/theme';
+import { Link } from 'expo-router';
 import { useRouter } from 'expo-router';
 import { useData } from '@/hooks/useData';
 import moment from 'moment';
@@ -75,13 +76,31 @@ export default function Notifications() {
                         <Text style={styles.subTitle} numberOfLines={1}>{item.description}</Text>
                     </View>
 
-                    <View style={styles.characteristicsContainer}>
+                    {/* <View style={styles.characteristicsContainer}>
                         {item.affectedPlaces.map((area, index) => (
                             <View key={index} style={styles.characteristicsBox}>
                                 <Text style={styles.characteristics} numberOfLines={2} ellipsizeMode="tail">{area}</Text>
                             </View>
                         ))}
-                    </View>
+                        </View> */}
+                    <View style={styles.characteristicsContainer}>
+                        {/* Show the first affected place */}
+                        {item.affectedPlaces.length > 0 && (
+                            <View style={styles.characteristicsBox}>
+                            <Text style={styles.characteristics} numberOfLines={1} ellipsizeMode="tail">
+                                {item.affectedPlaces[0]}
+                            </Text>
+                            </View>
+                        )}
+
+                        {/* If more than one affected place, show "+X more" */}
+                        {item.affectedPlaces.length > 1 && (
+                            <View style={styles.characteristicsBox}>
+                            <Text style={styles.characteristics}>{`+${item.affectedPlaces.length - 1} more`}</Text>
+                            </View>
+                        )}
+                        </View>
+
                 </View>
 
                 <View style={styles.distanceIconContainer}>
@@ -103,6 +122,11 @@ export default function Notifications() {
                     keyExtractor={(item) => item._id}
                     ListEmptyComponent={<Text>No Notifications available</Text>}
                 />
+                <Link href="/notifications/notificationmanager" asChild>
+                    <TouchableOpacity style={styles.floatingButton}>
+                        <MaterialIcons name="add" size={28} color="#fff" />
+                    </TouchableOpacity>
+                </Link>
             </View>
         </View>
     );
@@ -128,7 +152,7 @@ const styles = StyleSheet.create({
         borderRadius: 7,
         padding: 15,
         marginVertical: 5,
-        marginBottom:30,
+        //marginBottom:30,
         height: hp('10%'),
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -196,4 +220,20 @@ const styles = StyleSheet.create({
         color: COLORS.gray,
         marginTop: 15,
     },
+    floatingButton: {
+        position: 'absolute',
+        bottom: hp('4%'), 
+        right: wp('5%'),
+        backgroundColor: '#36813A',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+        },
 });

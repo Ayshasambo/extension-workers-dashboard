@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import {View, Text,TextInput,TouchableOpacity,StyleSheet,ScrollView,Switch} from 'react-native';
+import axios from 'axios';
+import {View, Text,TextInput,TouchableOpacity,StyleSheet,ScrollView,Switch,Alert} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useLocalSearchParams } from 'expo-router';
 import AppButton from '@/components/AppButton'; 
@@ -51,6 +52,9 @@ export default function LivestockManager() {
   const [isInBreedingCycle, setIsInBreedingCycle] = useState(false);
   const [isVaccinated, setIsVaccinated] = useState(false);
   const [isAlive, setIsAlive] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const { mutate, isPending, isSuccess, isError } = usePostData<any, Animals>('/animals');
   const { data: farmers = [] } = useData<Farmer[]>('/farmers');
@@ -89,6 +93,63 @@ export default function LivestockManager() {
 
    };
 
+
+//   const handleSave = async () => {
+//     if (!selectedFarmer) {
+//       alert('Please select a farmer.');
+//       return;
+//     }
+
+//     setIsSubmitting(true);
+//     setSubmitError(null);
+
+  
+//   const payload: Animals = {
+//     type,
+//     breed,
+//     age: Number(age),
+//     weight: Number(weight),
+//     healthStatus,
+//     farmer: selectedFarmer,
+//     identifier,
+//     vaccinationHistory: vaccinationHistory.split(',').map(s => s.trim()),
+//     isInBreedingCycle,
+//     expectedBreedingDate,
+//     isVaccinated,
+//     nextVaccinationDate,
+//     lastHealthCheckDate,
+//     healthIssues: healthIssues.split(',').map(s => s.trim()),
+//     isAlive,
+//     region,
+//   };
+//   console.log('Submitting animal:', payload);
+//   Alert.alert('Debug', JSON.stringify(payload, null, 2));
+//   console.log('handleSave triggered!');
+//   Alert.alert('Info', 'handleSave was triggered');
+
+//   try {
+//     const response = await fetch('https://l-press-backend.onrender.com/animals', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(payload),
+//     });
+
+//     if (!response.ok) {
+//       const errorData = await response.json();
+//       throw new Error(errorData.message || 'Something went wrong!');
+//     }
+
+//     setIsSubmitted(true);
+//     Alert.alert('Success', 'Livestock saved successfully!');
+//   } catch (error: any) {
+//     console.error('API Error:', error);
+//     setSubmitError(error.message);
+//   } finally {
+//     setIsSubmitting(false);
+//   }
+// };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -140,8 +201,16 @@ export default function LivestockManager() {
         backgroundColor={COLORS.primary}
         color="#fff"
       />
+      {/* <AppButton
+        label={isSubmitting ? 'Saving...' : isSubmitted ? 'Saved ✅' : 'Submit'}
+        onPress={handleSave}
+        backgroundColor={COLORS.primary}
+        color="#fff"
+      /> */}
 
-      {isError && <Text style={styles.error}>Failed to save. Please try again.</Text>}
+    {isError && <Text style={styles.error}>Failed to save. Please try again.</Text>}
+
+     {/* {submitError && <Text style={styles.error}>Error: {submitError}</Text>} */}
     </ScrollView>
   );
 }

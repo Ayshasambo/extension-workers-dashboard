@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View,Text,StyleSheet,FlatList,TextInput,TouchableOpacity,Modal,Pressable,Alert,ScrollView, Switch} from 'react-native';
+import {View,Text,StyleSheet,FlatList,TextInput,TouchableOpacity,Modal,Pressable,Alert,ScrollView, Switch, ActivityIndicator} from 'react-native';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Link } from 'expo-router';
@@ -32,7 +32,7 @@ interface animals {
 
 export default function LivestockList() {
   const [searchQuery, setSearchQuery] = useState('');
-  const { data: animals = [] } = useData<animals[]>('/animals');
+  const { data: animals = [], isLoading} = useData<animals[]>('/animals');
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedAnimal, setSelectedAnimal] = useState<animals | null>(null);
   const [detailsVisible, setDetailsVisible] = useState(false);
@@ -54,11 +54,22 @@ export default function LivestockList() {
   //const { mutate: updateLivestock } = useUpdateById<animals>('animals');
   const updateLivestock = useUpdateById<animals>('animals');
 
-
-
-  const filteredData = animals.filter((animal) =>
-    animal.type.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+//   const filteredData = animals.filter((animal) =>
+//     animal.type.toLowerCase().includes(searchQuery.toLowerCase())
+//   );
+const filteredData = animals.filter((animal) => {
+    const query = searchQuery.toLowerCase();
+  
+    const farmerName = typeof animal.farmer === 'string'
+      ? animal.farmer
+      : animal.farmer?.fullName || '';
+  
+    return (
+      animal.type.toLowerCase().includes(query) ||
+      animal.breed.toLowerCase().includes(query) ||
+      farmerName.toLowerCase().includes(query)
+    );
+  });
 
   const openMenu = (item: animals) => {
     setSelectedAnimal(item);
@@ -142,12 +153,17 @@ export default function LivestockList() {
           />
         </View>
 
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#36813A" />
+        ) : (
+
         <FlatList
           data={filteredData}
           renderItem={renderItem}
           keyExtractor={(item) => item._id}
           ListEmptyComponent={<Text>No data available for this resource.</Text>}
         />
+        )}
 
         <Link href="/livestock/livestockmanager" asChild>
           <TouchableOpacity style={styles.floatingButton}>
@@ -211,9 +227,9 @@ export default function LivestockList() {
       <TouchableOpacity onPress={() => setDetailsVisible(false)} style={styles.closeButton}>
         <Text style={{ color: 'white' }}>Close</Text>
       </TouchableOpacity>
-    </View>
-  </View>
-</Modal>
+      </View>
+     </View>
+    </Modal>
 
         {/* Edit Modal */}
         {/* <Modal transparent visible={editVisible} animationType="fade">
@@ -368,19 +384,19 @@ export default function LivestockList() {
         }
      /> */}
 
-<View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
-  <Text style={{ flex: 1, fontSize: 16 }}>Is livestock alive</Text>
-  <Switch
-    value={selectedAnimal?.isAlive || false}
-    onValueChange={(value) =>
-      setSelectedAnimal((prev) =>
-        prev ? { ...prev, isAlive: value } : null
-      )
-    }
-    thumbColor={selectedAnimal?.isAlive ? '#4CAF50' : '#f4f3f4'}
-    trackColor={{ false: '#767577', true: '#81b0ff' }}
-  />
-</View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
+        <Text style={{ flex: 1, fontSize: 16 }}>Is livestock alive</Text>
+        <Switch
+            value={selectedAnimal?.isAlive || false}
+            onValueChange={(value) =>
+            setSelectedAnimal((prev) =>
+                prev ? { ...prev, isAlive: value } : null
+            )
+            }
+            thumbColor={selectedAnimal?.isAlive ? '#4CAF50' : '#f4f3f4'}
+            trackColor={{ false: '#767577', true: '#81b0ff' }}
+        />
+        </View>
      {/* <TextInput
         style={styles.input}
         placeholder="Vaccination history (comma-separated)"
@@ -415,7 +431,7 @@ export default function LivestockList() {
      />
      
         
-    <AppButton
+     <AppButton
         label={isPending ? 'Saving...'  : 'Update'}
         //onPress={handleSave}
         onPress={() => {

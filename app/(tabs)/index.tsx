@@ -74,7 +74,7 @@ const Index = () => {
       };
 
     return (
-        <ScrollView style={{ flex: 1, backgroundColor: COLORS.lightGray1, }}>
+        <ScrollView style={{ flex: 1, backgroundColor: COLORS.lightGray1, marginTop: 30 }}>
         
             <View style={{width: '95%', height: hp(6), marginTop: Platform.OS === 'ios' ? 10 : 10, 
                     backgroundColor: COLORS.darkGray, borderRadius: 10, 
@@ -171,7 +171,7 @@ const Index = () => {
 
             {/* Livestock Count Bar */}
             <View style={{width: '95%',  margin: 5, 
-            backgroundColor: COLORS.white, borderRadius: 10, }}>
+            backgroundColor: COLORS.white, borderRadius: 10, paddingBottom: 15}}>
 
             <View style={{margin: 8}}>
             <Text style={{...FONTS.h3, color: COLORS.black}}> Vaccination Status </Text>
@@ -190,7 +190,7 @@ const Index = () => {
 
         {/* Breeding Cycle Bar */}
         <View style={{width: '95%',  margin: 5, 
-            backgroundColor: COLORS.white, borderRadius: 10, paddingBottom: 10 }}>
+            backgroundColor: COLORS.white, borderRadius: 10, paddingBottom: 25 }}>
 
             <View style={{margin: 8}}>
             <Text style={{...FONTS.h3, color: COLORS.black}}> Breeding Cycle</Text>

@@ -1,11 +1,12 @@
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
-import { Picker } from '@react-native-picker/picker';
 import { usePostData } from '@/hooks/usePostData';
 import AppButton from '@/components/AppButton'; 
 import { COLORS } from '@/constants/theme';
-import axios from 'axios'
+import axios from 'axios';
+import DropDownPicker from 'react-native-dropdown-picker';
+import moment from 'moment';
 
 
 type District = {
@@ -37,23 +38,32 @@ export default function AddFarmer() {
   const [districtId, setDistrictId] = useState('');
   const [role, setRole] = useState('farmer');
   
-
-  //const { mutate: addFarmer, isPending } = useAddFarmer();
+  // Dropdown state
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState<any[]>([]);
+  const [genderOpen, setGenderOpen] = useState(false);
+  const [genderItems] = useState([
+    { label: 'Male', value: 'male' },
+    { label: 'Female', value: 'female' }
+  ]);
+  
   const { mutate, isPending, isSuccess, isError } = usePostData<any, farmers>('/farmers');
 
   useEffect(() => {
     axios.get('https://l-press-backend.onrender.com/districts')
-      .then((res) => setDistricts(res.data))
+      .then((res) => {
+        setDistricts(res.data);
+        // Format districts for the dropdown
+        const dropdownItems = res.data.map((district: District) => ({
+          label: district.name,
+          value: district._id
+        }));
+        setItems(dropdownItems);
+      })
       .catch((err) => console.error('Failed to fetch districts:', err));
   }, []);
 
-//   const handleSave = () => {
-//     if (!fullName || !gender || !dateOfBirth || !phone || !nationalIdNumber ) {
-//       alert('Please fill all required fields');
-//       return;
-//     }
-
-const handleSave = () => {
+  const handleSave = () => {
     mutate({
       //id,
       fullName,
@@ -62,7 +72,7 @@ const handleSave = () => {
       phone,
       nationalIdNumber,
       email,
-      district:districtId,
+      district: districtId,
       role
     });
   };
@@ -99,33 +109,96 @@ const handleSave = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <TextInput style={styles.input} value={fullName} onChangeText={setFullName} placeholder="Full name" />
-      <TextInput style={styles.input} value={gender} onChangeText={setGender} placeholder="Gender" />
-      <View style={styles.dobIcon}>
-        <MaterialIcons name="calendar-today" size={24} color="#888" style={styles.dobicon} />
-        <TextInput
-          style={styles.dobinput}
-          value={dateOfBirth}
-          onChangeText={setDateOfBirth}
-          placeholder="Date of birth (YYYY-MM-DD)"
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Full Name *</Text>
+        <TextInput 
+          style={styles.input} 
+          value={fullName} 
+          onChangeText={setFullName} 
+          placeholder="Enter farmer's full name"
         />
       </View>
-      <TextInput style={styles.input} value={phone} onChangeText={setPhone} placeholder="Phone number" keyboardType="phone-pad" />
-      <TextInput style={styles.input} value={nationalIdNumber} onChangeText={setNationalIdNumber} placeholder="NIN" />
-      <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Email (optional)" />
-      
-        <View style={styles.pickerContainer}>
-        <Picker
-        selectedValue={districtId}
-        onValueChange={(itemValue) => setDistrictId(itemValue)}
-        style={styles.picker}
-      >
-        <Picker.Item label="Select District(Optional)" value="" />
-        {districts.map((dist) => (
-          <Picker.Item key={dist._id} label={dist.name} value={dist._id} />
-        ))}
-      </Picker>
+
+      <View style={styles.dropdownContainer}>
+        <Text style={styles.label}>Gender *</Text>
+        <DropDownPicker
+          open={genderOpen}
+          value={gender}
+          items={genderItems}
+          setOpen={setGenderOpen}
+          setValue={setGender}
+          style={styles.dropdown}
+          dropDownContainerStyle={styles.dropdownList}
+          placeholder="Select gender"
+          listMode="SCROLLVIEW"
+          scrollViewProps={{
+            nestedScrollEnabled: true,
+          }}
+        />
       </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Date of Birth (YYYY-MM-DD) *</Text>
+        <TextInput 
+          style={styles.input} 
+          value={dateOfBirth} 
+          onChangeText={setDateOfBirth} 
+          placeholder="YYYY-MM-DD" 
+          //keyboardType="phone-pad"
+        />
+      </View>     
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Phone Number *</Text>
+        <TextInput 
+          style={styles.input} 
+          value={phone} 
+          onChangeText={setPhone} 
+          placeholder="Enter phone number" 
+          keyboardType="phone-pad"
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>National ID Number (NIN) *</Text>
+        <TextInput 
+          style={styles.input} 
+          value={nationalIdNumber} 
+          onChangeText={setNationalIdNumber} 
+          placeholder="Enter NIN"
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Email Address</Text>
+        <TextInput 
+          style={styles.input} 
+          value={email} 
+          onChangeText={setEmail} 
+          placeholder="Enter email address (optional)"
+          keyboardType="email-address"
+        />
+      </View>
+
+      <View style={styles.dropdownContainer}>
+        <Text style={styles.label}>District</Text>
+        <DropDownPicker
+          open={open}
+          value={districtId}
+          items={items}
+          setOpen={setOpen}
+          setValue={setDistrictId}
+          setItems={setItems}
+          placeholder="Select District (Optional)"
+          style={styles.dropdown}
+          dropDownContainerStyle={styles.dropdownList}
+          listMode="SCROLLVIEW"
+          scrollViewProps={{
+            nestedScrollEnabled: true,
+          }}
+        />
+      </View>
+
       <AppButton
         label={isPending ? 'Saving...' : isSuccess ? 'Saved ✅' : 'Submit'}
         onPress={handleSave}
@@ -147,14 +220,28 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     gap: 10,
-    marginTop:20
+    marginTop: 20,
+    paddingBottom: 200
+  },
+  inputContainer: {
+    marginBottom: 15,
+    zIndex: 1,
+  },
+  dropdownContainer: {
+    marginBottom: 15,
+    zIndex: 3000,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#333',
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    padding: 10,
-    marginBottom: 15,
+    padding: 12,
     backgroundColor: '#F7F7FA',
   },
   dobIcon: {
@@ -175,17 +262,13 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
   },
-  pickerContainer: {
-    borderWidth: 1,
+  dropdown: {
     borderColor: '#ccc',
-    borderRadius: 8,
-    overflow: 'hidden',
     backgroundColor: '#F7F7FA',
-    marginBottom: 20,
   },
-  picker: {
-    height: 50,
-    width: '100%',
+  dropdownList: {
+    backgroundColor: '#F7F7FA',
+    borderColor: '#ccc',
   },
   button: {
     backgroundColor: '#36813A', 
@@ -203,6 +286,7 @@ const styles = StyleSheet.create({
   error: {
     color: 'red',
     marginTop: 10,
+    textAlign: 'center',
   },
   
 });

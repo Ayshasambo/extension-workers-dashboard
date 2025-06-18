@@ -5,6 +5,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp, heightPercentage
 import { COLORS, FONTS } from '@/constants/theme';
 import { useRouter,  } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function Login() {
@@ -41,9 +42,10 @@ export default function Login() {
   };
 
   return (
+    <SafeAreaView style={{flex: 1}}>
     <View style={{ backgroundColor: 'white', flex: 1 }}>
       
-      <View style={{ alignItems: 'center', justifyContent: 'center', backgroundColor: 'white', marginBottom: heightPercentageToDP(5) }}>
+      <View style={{ alignItems: 'center', justifyContent: 'center', backgroundColor: 'white', marginBottom: heightPercentageToDP(5), marginTop: 50 }}>
         <View>
           {/* <Image source={require('@/assets/images/paylodr-primary.png')}
             style={{
@@ -52,6 +54,9 @@ export default function Login() {
               height: 150
             }}
           /> */}
+         <Text style={{ ...FONTS.h2, color: COLORS.primary, marginBottom: heightPercentageToDP(15) }}>
+          Livestock Nigeria
+        </Text>
         </View>
         <Text style={{ ...FONTS.body2 }}>
           Login
@@ -87,7 +92,7 @@ export default function Login() {
         />
       </View>
 
-      <View style={{ alignSelf: 'center', marginTop: hp(5), flexDirection: 'row' }}>
+      {/* <View style={{ alignSelf: 'center', marginTop: hp(5), flexDirection: 'row' }}>
         <Text style={{ ...FONTS.body5, marginRight: 3 }}>
           Don't have an account?
         </Text>
@@ -96,7 +101,7 @@ export default function Login() {
             Register
           </Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       <View style={{ alignSelf: 'center', marginTop: hp(1), flexDirection: 'row' }}>
         <Text style={{ ...FONTS.body5, marginRight: 3 }}>
@@ -109,12 +114,13 @@ export default function Login() {
         </TouchableOpacity>
       </View>
 
-      {/* <View style={{ alignSelf: 'center', marginTop: hp(25), flexDirection: 'column' }}>
+      <View style={{ alignSelf: 'center', marginTop: hp(25), flexDirection: 'column' }}>
         <Text style={{ ...FONTS.body5 }}>
-          Nigerian Meteorological Agency Copyright © 2024
+          Livestock Nigeria Copyright © 2025
         </Text>
-      </View> */}
+      </View>
     </View>
+    </SafeAreaView>
   )
 }
 

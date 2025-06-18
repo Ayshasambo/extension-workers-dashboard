@@ -487,11 +487,11 @@ export const workTypes = ["Farmer","Extension Worker","Veterinary Doctor"
 
 export const extensionWorker = {
   id: 1,
-  name: "Buhari Zailani",
-  email: "bz@gmail.com",
-  phone: "08012345678",
-  lga: "Zaria",
-  state: "Kaduna",
+  name: "Yusuf Habu",
+  email: "yuhyam95@gmail.com",
+  phone: "08064763531",
+  lga: "Misau",
+  state: "Bauchi",
   worktype: "Extension Worker"
 };
 

@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
         borderRadius: 7,
         padding: 15,
         marginVertical: 5,
-        height: hp('10%'),
+        height: hp('12%'),
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     },
     characteristicsBox: {
         backgroundColor: '#EDEDF0',
-        padding: 5,
+        padding: 3,
         borderRadius: 99,
         marginRight: 5,
     },

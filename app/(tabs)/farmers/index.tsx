@@ -1,6 +1,6 @@
 // app/farmers/FarmersList.tsx
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -8,34 +8,51 @@ import { Link } from 'expo-router';
 import { useData } from '../../../hooks/useData'; 
 
 
-interface farmers{
-  _id:string
-  fullName: string,
-  gender: string,
-  dateOfBirth: string,
-  phone: string,
-  nationalIdNumber: string,
-  email: string,
-  district: string,
-  role: string
+interface farmers {
+  _id: string;
+  fullName: string;
+  gender: string;
+  dateOfBirth: string;
+  phone: string;
+  nationalIdNumber: string;
+  email: string;
+  district: {
+    _id: string;
+    name: string;
+    region: string;
+  } | string;
+  role: string;
+  createdAt: string;
 }
 
 
 export default function FarmersList() {
   const [searchQuery, setSearchQuery] = useState('');
-  //const { data: farmers, isLoading } = useData();
-  const { data:farmers=[], isLoading, error } = useData<farmers[]>('/farmers')
+  const [refreshing, setRefreshing] = useState(false);
+  const { data: farmers = [], isLoading, error, refetch } = useData<farmers[]>('/farmers');
 
-  //const filteredData = (farmers || []).filter((farmer: any) =>
-  const filteredData = farmers.filter((farmer) =>
+  // Sort farmers in descending order by creation date
+  const sortedFarmers = [...farmers].sort((a, b) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
+  const filteredData = sortedFarmers.filter((farmer) =>
     farmer.fullName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const renderItem = ({ item }: { item: any }) => {
-    // const livestock = dummyLivestockMap[item._id] || [];
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetch]);
 
+  const renderItem = ({ item }: { item: farmers }) => {
+    const district = typeof item.district === 'object' ? item.district : null;
+    
     return (
-      //<Link href={{ pathname: "/farmers/profile", params: { id: item._id } }} asChild>
       <Link href={`/farmers/profile?id=${item._id}`} asChild>
         <TouchableOpacity style={styles.resourceContainer}>
           <View style={styles.textContainer}>
@@ -44,18 +61,12 @@ export default function FarmersList() {
             </View>
 
             <View style={styles.infoContainer}>
-              <View style={styles.stateContainer}>
-                <Text style={styles.stateText}>{item.district?.region || 'Unknown Region'}</Text>
-              </View>
-{/* 
-              <View style={styles.livestockContainer}>
-                <Text style={styles.livestockText}>
-                  {livestock.map((liv) => `${liv.count} ${liv.type}`).join(', ')}
-                </Text>
+              {/* <View style={styles.stateContainer}>
+                <Text style={styles.stateText}>{district?.region || 'Unknown Region'}</Text>
               </View> */}
 
               <View style={styles.lgaContainer}>
-                <Text style={styles.lgaText}>{item.district?.name || 'No District'}</Text>
+                <Text style={styles.lgaText}>{district?.name || 'No District'}</Text>
               </View>
             </View>
           </View>
@@ -84,14 +95,27 @@ export default function FarmersList() {
           />
         </View>
 
-        {isLoading ? (
+        {isLoading && !refreshing ? (
           <ActivityIndicator size="large" color="#36813A" />
         ) : (
           <FlatList
             data={filteredData}
             renderItem={renderItem}
             keyExtractor={(item) => item._id}
-            ListEmptyComponent={<Text>No farmers found.</Text>}
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No farmers found.</Text>
+              </View>
+            }
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={['#36813A']}
+                tintColor="#36813A"
+              />
+            }
+            contentContainerStyle={styles.listContainer}
           />
         )}
 
@@ -107,153 +131,144 @@ export default function FarmersList() {
 
 const styles = StyleSheet.create({
     container: {
-                //backgroundColor: '#FFFFFF',
-                flex:1,
-                marginBottom: 50
-            },
-            innerContainer:{
-               width: wp('100%'), 
-               alignSelf:'center',
-               marginTop:20,
-               flex:1
-            },
-            searchContainer: {
-                flexDirection: 'row',
-                alignItems: 'center',
-                width: wp('90%'),
-                alignSelf: 'center',
-                marginBottom: 10,
-                borderWidth: 1,
-                borderColor: '#F7F7FA',
-                borderRadius: 7,
-                paddingHorizontal: 10, 
-                backgroundColor: '#FFFFFF',
-                borderTopWidth: 0,
-                shadowColor: '#5A5B6A', 
-                shadowOffset: {width: 0, height: 2},
-                shadowOpacity: 0.1, 
-                shadowRadius: 5, 
-                elevation: 5, 
-            },
-            searchBar: {
-                flex: 1, 
-                height: hp('7%'),
-            },
-            searchIcon: {
-                marginRight: 10, 
-            },
-            tuneIcon: {
-                marginLeft: 10,  
-            },
-            resourceContainer: {
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingHorizontal: 10,
-                marginHorizontal: 10,
-                backgroundColor: '#FFFFFF',
-                borderColor: '#F7F7FA',
-                borderRadius: 7,
-                padding: 20,
-                marginVertical: 5,
-                height:hp('10%'),
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 5,
-                elevation: 2,
-                
-            },
-            textContainer: {
-                flex: 1,
-                flexDirection: 'column', 
-                justifyContent: 'center', 
-                paddingLeft: 5,
-                marginTop:10,
-            },
-            titleContainer: {
-               marginVertical:5
-            },
-            title: {
-                fontSize: 18,
-                fontWeight: '500',
-                color: '#3A3A44',
-            },
-            infoContainer: {
-                flexDirection: 'row', 
-                //alignItems: 'center',
-                //justifyContent: 'space-between',
-                marginTop: 5,
-                gap:10
-            },
-            livestockContainer: {
-                // flexDirection: 'row',
-                 flexWrap: 'wrap',
-                backgroundColor: "#EDEDF0",
-                padding: 6,
-                borderRadius: 99,
-            }, 
-            livestockText: {
-                fontSize: 12,
-                color: '#666',
-            },
-            stateContainer: {
-                // flexDirection: 'row',
-                flexWrap: 'wrap',
-                backgroundColor: "#EDEDF0",
-                padding: 6,
-                borderRadius: 70,
-               // marginRight:10,
-            },
-            stateText: {
-                fontSize: 12,
-                color: '#666',
-            },
-            lgaContainer: {
-                // flexDirection: 'row',
-                flexWrap: 'wrap',
-                backgroundColor: "#EDEDF0",
-                padding: 6,
-                borderRadius: 70,
-                //marginLeft:10
-            },
-            lgaText: {
-                fontSize: 12,
-                color: '#666',
-            },
-            distanceIconContainer: {
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap:5,
-                //justifyContent: 'space-between',
-                marginLeft: 10
-            },
-            distanceItem: {
-                alignItems: 'center',
-                marginHorizontal: 5,
-            },
-            distancetext: {
-                fontSize: 12,
-                color: '#36813A',
-                fontWeight: 'bold',
-                marginTop: 2,
-            },
-            floatingButton: {
-                position: 'absolute',
-                bottom: hp('4%'), // Adjust as needed
-                right: wp('5%'),
-                backgroundColor: '#36813A',
-                width: 60,
-                height: 60,
-                borderRadius: 30,
-                justifyContent: 'center',
-                alignItems: 'center',
-                elevation: 5,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.3,
-                shadowRadius: 2,
-              },
-              
+        flex: 1,
+        marginBottom: 50,
+        paddingBottom: 50
+    },
+    innerContainer:{
+        width: wp('100%'), 
+        alignSelf: 'center',
+        marginTop: 20,
+        flex: 1
+    },
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: wp('90%'),
+        alignSelf: 'center',
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: '#F7F7FA',
+        borderRadius: 7,
+        paddingHorizontal: 10, 
+        backgroundColor: '#FFFFFF',
+        borderTopWidth: 0,
+        shadowColor: '#5A5B6A', 
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.1, 
+        shadowRadius: 5, 
+        elevation: 5, 
+    },
+    searchBar: {
+        flex: 1, 
+        height: hp('7%'),
+    },
+    searchIcon: {
+        marginRight: 10, 
+    },
+    listContainer: {
+        flexGrow: 1,
+        paddingBottom: 20
+    },
+    emptyContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingTop: 40
+    },
+    emptyText: {
+        fontSize: 16,
+        color: '#666',
+    },
+    resourceContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 10,
+        marginHorizontal: 10,
+        backgroundColor: '#FFFFFF',
+        borderColor: '#F7F7FA',
+        borderRadius: 7,
+        padding: 20,
+        marginVertical: 5,
+        height: hp('10%'),
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 2,
+    },
+    textContainer: {
+        flex: 1,
+        flexDirection: 'column', 
+        justifyContent: 'center', 
+        paddingLeft: 5,
+        marginTop: 10,
+    },
+    titleContainer: {
+        marginVertical: 5
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: '500',
+        color: '#3A3A44',
+    },
+    infoContainer: {
+        flexDirection: 'row', 
+        marginTop: 5,
+        gap: 10
+    },
+    stateContainer: {
+        flexWrap: 'wrap',
+        backgroundColor: "#EDEDF0",
+        padding: 6,
+        borderRadius: 70,
+    },
+    stateText: {
+        fontSize: 12,
+        color: '#666',
+    },
+    lgaContainer: {
+        flexWrap: 'wrap',
+        backgroundColor: "#EDEDF0",
+        padding: 6,
+        borderRadius: 70,
+    },
+    lgaText: {
+        fontSize: 12,
+        color: '#666',
+    },
+    distanceIconContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        marginLeft: 10
+    },
+    distanceItem: {
+        alignItems: 'center',
+        marginHorizontal: 5,
+    },
+    distancetext: {
+        fontSize: 12,
+        color: '#36813A',
+        fontWeight: 'bold',
+        marginTop: 2,
+    },
+    floatingButton: {
+        position: 'absolute',
+        bottom: hp('4%'),
+        right: wp('5%'),
+        backgroundColor: '#36813A',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    }
 });
 
 

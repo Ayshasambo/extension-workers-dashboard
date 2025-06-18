@@ -23,24 +23,63 @@ export default function Profile() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.imageContainer}>
-        <Image source={image ? { uri: image } : defaultImage.img} style={styles.profileImage} />
+        {/* <Image source={image ? { uri: image } : defaultImage.img} style={styles.profileImage} /> */}
         </View>
-      <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Name"/>
-      <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Email" keyboardType="email-address" />
-      <TextInput style={styles.input} value={phone} onChangeText={setPhone} placeholder="Phone" keyboardType="phone-pad" />
-      <TextInput style={styles.input} value={lga} onChangeText={setLga} placeholder="LGA" />
-      <TextInput style={styles.input} value={state} onChangeText={setState} placeholder="State" />
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={selectedWorkType}
-            onValueChange={(itemValue) => setSelectedWorkType(itemValue)}
-            style={styles.picker}
-          >
-            {workTypes.map((work, index) => (
-              <Picker.Item key={index} label={work} value={work} />
-            ))}
-          </Picker>
-        </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Full Name</Text>
+        <TextInput 
+          style={styles.input} 
+          value={name} 
+          onChangeText={setName} 
+          placeholder="Enter your full name"
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Email Address</Text>
+        <TextInput 
+          style={styles.input} 
+          value={email} 
+          onChangeText={setEmail} 
+          placeholder="Enter your email" 
+          keyboardType="email-address" 
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Phone Number</Text>
+        <TextInput 
+          style={styles.input} 
+          value={phone} 
+          onChangeText={setPhone} 
+          placeholder="Enter your phone number" 
+          keyboardType="phone-pad" 
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Local Government Area (LGA)</Text>
+        <TextInput 
+          style={styles.input} 
+          value={lga} 
+          onChangeText={setLga} 
+          placeholder="Enter your LGA" 
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>State</Text>
+        <TextInput 
+          style={styles.input} 
+          value={state} 
+          onChangeText={setState} 
+          placeholder="Enter your state" 
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Profile Photo</Text>
         <TouchableOpacity style={styles.uploadField} onPress={async () => {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== 'granted') {
@@ -60,6 +99,7 @@ export default function Profile() {
             <MaterialIcons name="cloud-upload" size={24} color="#aaa" />
             <Text style={styles.placeholder}>Upload Photo</Text>
         </TouchableOpacity>
+      </View>
 
         <TouchableOpacity style={styles.button} onPress={handleSave}>
             <Text style={styles.buttonText}>Update</Text>
@@ -79,11 +119,10 @@ const styles = StyleSheet.create({
     alignSelf:'center',
     borderRadius: 15,
     overflow: 'hidden',
-    marginBottom: 10,
+    marginBottom: 20,
     marginTop: 10,
     borderWidth: 2,
     borderColor: '#36813A',
-    
   },
   image: {
     width: '100%',
@@ -94,12 +133,20 @@ const styles = StyleSheet.create({
     height: 120,
     marginBottom: 20,
   },
+  inputContainer: {
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#333',
+  },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    padding: 10,
-    marginBottom: 15,
+    padding: 12,
     backgroundColor: '#F7F7FA',
   },
   pickerContainer: {
@@ -114,11 +161,6 @@ const styles = StyleSheet.create({
     height: 50,
     width: '100%',
   },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
   uploadField: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -127,9 +169,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
     backgroundColor: '#F7F7FA',
-    //backgroundColor: '#f9f9f9',
   },
   placeholder: {
     marginLeft: 10,
@@ -143,7 +183,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 10,
-    marginBottom:80
+    marginBottom: 80
   },
   buttonText: {
     color: 'white',

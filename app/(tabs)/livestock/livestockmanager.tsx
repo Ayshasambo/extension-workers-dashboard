@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import {View, Text,TextInput,TouchableOpacity,StyleSheet,ScrollView,Switch,Alert} from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { useLocalSearchParams } from 'expo-router';
 import AppButton from '@/components/AppButton'; 
 import { COLORS } from '@/constants/theme';
 import { usePostData } from '@/hooks/usePostData';
 import { useData } from '@/hooks/useData';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 interface Farmer {
   _id: string;
@@ -47,17 +47,26 @@ export default function LivestockManager() {
   const [nextVaccinationDate, setNextVaccinationDate] = useState('');
   const [lastHealthCheckDate, setLastHealthCheckDate] = useState('');
   const [region, setRegion] = useState('');
-  //const [farmer, setFarmer] = useState('');
   const [selectedFarmer, setSelectedFarmer] = useState<string | null>(null); 
   const [isInBreedingCycle, setIsInBreedingCycle] = useState(false);
   const [isVaccinated, setIsVaccinated] = useState(false);
   const [isAlive, setIsAlive] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Dropdown state
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState<any[]>([]);
 
   const { mutate, isPending, isSuccess, isError } = usePostData<any, Animals>('/animals');
   const { data: farmers = [] } = useData<Farmer[]>('/farmers');
+
+  // Format farmers for dropdown
+  React.useEffect(() => {
+    const dropdownItems = farmers.map((farmer) => ({
+      label: farmer.fullName,
+      value: farmer._id
+    }));
+    setItems(dropdownItems);
+  }, [farmers]);
 
   const handleSave = () => {
     if (!selectedFarmer) {
@@ -90,127 +99,190 @@ export default function LivestockManager() {
         console.log("Livestock saved successfully!");
       }
     });
-
-   };
-
-
-//   const handleSave = async () => {
-//     if (!selectedFarmer) {
-//       alert('Please select a farmer.');
-//       return;
-//     }
-
-//     setIsSubmitting(true);
-//     setSubmitError(null);
-
-  
-//   const payload: Animals = {
-//     type,
-//     breed,
-//     age: Number(age),
-//     weight: Number(weight),
-//     healthStatus,
-//     farmer: selectedFarmer,
-//     identifier,
-//     vaccinationHistory: vaccinationHistory.split(',').map(s => s.trim()),
-//     isInBreedingCycle,
-//     expectedBreedingDate,
-//     isVaccinated,
-//     nextVaccinationDate,
-//     lastHealthCheckDate,
-//     healthIssues: healthIssues.split(',').map(s => s.trim()),
-//     isAlive,
-//     region,
-//   };
-//   console.log('Submitting animal:', payload);
-//   Alert.alert('Debug', JSON.stringify(payload, null, 2));
-//   console.log('handleSave triggered!');
-//   Alert.alert('Info', 'handleSave was triggered');
-
-//   try {
-//     const response = await fetch('https://l-press-backend.onrender.com/animals', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify(payload),
-//     });
-
-//     if (!response.ok) {
-//       const errorData = await response.json();
-//       throw new Error(errorData.message || 'Something went wrong!');
-//     }
-
-//     setIsSubmitted(true);
-//     Alert.alert('Success', 'Livestock saved successfully!');
-//   } catch (error: any) {
-//     console.error('API Error:', error);
-//     setSubmitError(error.message);
-//   } finally {
-//     setIsSubmitting(false);
-//   }
-// };
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* <TextInput style={styles.input} placeholder="Farmer's name" value={farmer} onChangeText={setFarmer} /> */}
-      <View style={styles.pickerContainer}>
-      <Picker
-        selectedValue={selectedFarmer}
-        style={styles.picker}
-        onValueChange={(itemValue) => setSelectedFarmer(itemValue)}
-      >
-        <Picker.Item label="Select a farmer" value={null} />
-        {farmers.map((farmer: Farmer) => ( 
-          <Picker.Item key={farmer._id} label={farmer.fullName} value={farmer._id} />
-        ))}
-      </Picker>
-      </View>
-      <TextInput style={styles.input} placeholder="Livestock" value={type} onChangeText={setType} />
-      <TextInput style={styles.input} placeholder="Breed" value={breed} onChangeText={setBreed} />
-      <TextInput style={styles.input} placeholder="Age" value={age} onChangeText={setAge} keyboardType="numeric" />
-      <TextInput style={styles.input} placeholder="Weight" value={weight} onChangeText={setWeight} keyboardType="numeric" />
-      <TextInput style={styles.input} placeholder="Health Status" value={healthStatus} onChangeText={setHealthStatus} />
-      <TextInput style={styles.input} placeholder="Identifier" value={identifier} onChangeText={setIdentifier} />
-      <TextInput style={styles.input} placeholder="Vaccination History (comma-separated)" value={vaccinationHistory} onChangeText={setVaccinationHistory} />
-      <TextInput style={styles.input} placeholder="Health Issues (comma-separated)" value={healthIssues} onChangeText={setHealthIssues} />
-      <TextInput style={styles.input} placeholder="Expected Breeding Date (YYYY-MM-DD)" value={expectedBreedingDate} onChangeText={setExpectedBreedingDate} />
-      <TextInput style={styles.input} placeholder="Next Vaccination Date (YYYY-MM-DD)" value={nextVaccinationDate} onChangeText={setNextVaccinationDate} />
-      <TextInput style={styles.input} placeholder="Last Health Check Date (YYYY-MM-DD)" value={lastHealthCheckDate} onChangeText={setLastHealthCheckDate} />
-      <TextInput style={styles.input} placeholder="Region" value={region} onChangeText={setRegion} />
-
-      <View style={styles.switchContainer}>
-        <Text>In Breeding Cycle:</Text>
-        <Switch value={isInBreedingCycle} onValueChange={setIsInBreedingCycle} />
-      </View>
-      <View style={styles.switchContainer}>
-        <Text>Is Vaccinated:</Text>
-        <Switch value={isVaccinated} onValueChange={setIsVaccinated} />
-      </View>
-      <View style={styles.switchContainer}>
-        <Text>Is Alive:</Text>
-        <Switch value={isAlive} onValueChange={setIsAlive} />
+      <View style={styles.dropdownContainer}>
+        <Text style={styles.label}>Select Farmer *</Text>
+        <DropDownPicker
+          open={open}
+          value={selectedFarmer}
+          items={items}
+          setOpen={setOpen}
+          setValue={setSelectedFarmer}
+          setItems={setItems}
+          placeholder="Select a farmer"
+          style={styles.dropdown}
+          dropDownContainerStyle={styles.dropdownList}
+          listMode="SCROLLVIEW"
+          scrollViewProps={{
+            nestedScrollEnabled: true,
+          }}
+        />
       </View>
 
-      {/* <TouchableOpacity style={styles.button} onPress={handleSave} disabled={isLoading}>
-        <Text style={styles.buttonText}>{isLoading ? 'Saving...' : isSuccess ? 'Saved ✅' : 'Submit'}</Text>
-      </TouchableOpacity> */}
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Livestock Type *</Text>
+        <TextInput 
+          style={styles.input} 
+          placeholder="Enter livestock type" 
+          value={type} 
+          onChangeText={setType} 
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Breed *</Text>
+        <TextInput 
+          style={styles.input} 
+          placeholder="Enter breed" 
+          value={breed} 
+          onChangeText={setBreed} 
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Age (in months) *</Text>
+        <TextInput 
+          style={styles.input} 
+          placeholder="Enter age" 
+          value={age} 
+          onChangeText={setAge} 
+          keyboardType="numeric" 
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Weight (in kg) *</Text>
+        <TextInput 
+          style={styles.input} 
+          placeholder="Enter weight" 
+          value={weight} 
+          onChangeText={setWeight} 
+          keyboardType="numeric" 
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Health Status *</Text>
+        <TextInput 
+          style={styles.input} 
+          placeholder="Enter health status" 
+          value={healthStatus} 
+          onChangeText={setHealthStatus} 
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Identifier/Tag Number *</Text>
+        <TextInput 
+          style={styles.input} 
+          placeholder="Enter identifier" 
+          value={identifier} 
+          onChangeText={setIdentifier} 
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Vaccination History</Text>
+        <TextInput 
+          style={styles.input} 
+          placeholder="Enter vaccination history (comma-separated)" 
+          value={vaccinationHistory} 
+          onChangeText={setVaccinationHistory}
+          multiline
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Health Issues</Text>
+        <TextInput 
+          style={styles.input} 
+          placeholder="Enter health issues (comma-separated)" 
+          value={healthIssues} 
+          onChangeText={setHealthIssues}
+          multiline
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Expected Breeding Date(YYYY-MM-DD)</Text>
+        <TextInput 
+          style={styles.input} 
+          placeholder="YYYY-MM-DD" 
+          value={expectedBreedingDate} 
+          onChangeText={setExpectedBreedingDate} 
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Next Vaccination Date (YYYY-MM-DD)</Text>
+        <TextInput 
+          style={styles.input} 
+          placeholder="YYYY-MM-DD"    
+          value={nextVaccinationDate}   
+          onChangeText={setNextVaccinationDate} 
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Last Health Check Date (YYYY-MM-DD)</Text>
+        <TextInput 
+          style={styles.input} 
+          placeholder="YYYY-MM-DD" 
+          value={lastHealthCheckDate} 
+          onChangeText={setLastHealthCheckDate} 
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Location *</Text>
+        <TextInput 
+          style={styles.input} 
+          placeholder="Enter region" 
+          value={region} 
+          onChangeText={setRegion} 
+        />
+      </View>
+
+      <View style={styles.switchesContainer}>
+        <View style={styles.switchContainer}>
+          <Text style={styles.switchLabel}>In Breeding Cycle</Text>
+          <Switch 
+            value={isInBreedingCycle} 
+            onValueChange={setIsInBreedingCycle}
+            trackColor={{ false: '#767577', true: '#36813A' }}
+          />
+        </View>
+
+        <View style={styles.switchContainer}>
+          <Text style={styles.switchLabel}>Is Vaccinated</Text>
+          <Switch 
+            value={isVaccinated} 
+            onValueChange={setIsVaccinated}
+            trackColor={{ false: '#767577', true: '#36813A' }}
+          />
+        </View>
+
+        <View style={styles.switchContainer}>
+          <Text style={styles.switchLabel}>Is Alive</Text>
+          <Switch 
+            value={isAlive} 
+            onValueChange={setIsAlive}
+            trackColor={{ false: '#767577', true: '#36813A' }}
+          />
+        </View>
+      </View>
+
       <AppButton
         label={isPending ? 'Saving...' : isSuccess ? 'Saved ✅' : 'Submit'}
         onPress={handleSave}
         backgroundColor={COLORS.primary}
         color="#fff"
       />
-      {/* <AppButton
-        label={isSubmitting ? 'Saving...' : isSubmitted ? 'Saved ✅' : 'Submit'}
-        onPress={handleSave}
-        backgroundColor={COLORS.primary}
-        color="#fff"
-      /> */}
 
-    {isError && <Text style={styles.error}>Failed to save. Please try again.</Text>}
-
-     {/* {submitError && <Text style={styles.error}>Error: {submitError}</Text>} */}
+      {isError && <Text style={styles.error}>Failed to save. Please try again.</Text>}
     </ScrollView>
   );
 }
@@ -218,51 +290,59 @@ export default function LivestockManager() {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    paddingBottom: 100,
+    paddingBottom: 200,
+  },
+  inputContainer: {
+    marginBottom: 16,
+    zIndex: 1,
+  },
+  dropdownContainer: {
+    marginBottom: 16,
+    zIndex: 3000,
   },
   label: {
     fontSize: 16,
+    fontWeight: 'bold',
     marginBottom: 8,
-  },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    overflow: 'hidden',
-    backgroundColor: '#F7F7FA',
-    marginBottom: 20,
-  },
-  picker: {
-    height: 50,
-    width: '100%',
+    color: '#333',
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    marginBottom: 12,
-    padding: 10,
-    borderRadius: 6,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#F7F7FA',
   },
-  button: {
-    backgroundColor: '#168543',
-    padding: 14,
-    borderRadius: 6,
-    alignItems: 'center',
-    marginTop: 12,
+  dropdown: {
+    borderColor: '#ccc',
+    backgroundColor: '#F7F7FA',
   },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+  dropdownList: {
+    backgroundColor: '#F7F7FA',
+    borderColor: '#ccc',
   },
-  error: {
-    color: 'red',
-    marginTop: 10,
+  switchesContainer: {
+    marginVertical: 16,
+    zIndex: 1,
   },
   switchContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    paddingVertical: 8,
+    marginBottom: 8,
+    backgroundColor: '#F7F7FA',
+    padding: 12,
+    borderRadius: 8,
+  },
+  switchLabel: {
+    fontSize: 16,
+    color: '#333',
+  },
+  error: {
+    color: 'red',
+    marginTop: 10,
+    textAlign: 'center',
   },
 });
 

@@ -5,8 +5,9 @@ import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useUpdateById } from '@/hooks/useUpdate'; 
-import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
+import moment from 'moment';
+import DropDownPicker from 'react-native-dropdown-picker';
 //rconst defaultImage = {img: require('./../../../assets/images/cow.jpg') }
 
 type Farmer = {
@@ -37,7 +38,9 @@ export default function FarmersBiodata({ farmer }: FarmersBiodataProps) {
   const [image, setImage] = useState<string | null>(null);
   const [fullName, setFullName] = useState(farmer.fullName || '');
   const [gender, setGender] = useState(farmer.gender || '');
-  const [dateOfBirth, setDateOfBirth] = useState(farmer.dateOfBirth || '');
+  const [dateOfBirth, setDateOfBirth] = useState(
+    farmer.dateOfBirth ? moment(farmer.dateOfBirth).format('YYYY-MM-DD') : ''
+  );
   const [phone, setPhone] = useState(farmer.phone || '');
   const [nationalIdNumber, setNationalIdNumber] = useState(farmer.nationalIdNumber || '');
   const [email, setEmail] = useState(farmer.email || '');
@@ -45,15 +48,28 @@ export default function FarmersBiodata({ farmer }: FarmersBiodataProps) {
     typeof farmer.district === 'object' && farmer.district !== null
     ? farmer.district._id
     : farmer.district || ''
-  );//useState(farmer.district || '');
+  );
   const [role, setRole] = useState(farmer.role || 'farmer');
   const [districts, setDistricts] = useState<District[]>([]);
+  
+  // Dropdown state
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState<any[]>([]);
 
   const { mutate: updateFarmer } = useUpdateById<Farmer>('farmers');
+
   useEffect(() => {
     fetch('https://l-press-backend.onrender.com/districts')
       .then((res) => res.json())
-      .then((data) => setDistricts(data))
+      .then((data) => {
+        setDistricts(data);
+        // Format districts for the dropdown
+        const dropdownItems = data.map((district: District) => ({
+          label: district.name,
+          value: district._id
+        }));
+        setItems(dropdownItems);
+      })
       .catch((err) => console.error('Failed to fetch districts:', err));
   }, []);
 
@@ -63,7 +79,7 @@ export default function FarmersBiodata({ farmer }: FarmersBiodataProps) {
     const payload = {
       fullName,
       gender,
-      dateOfBirth,
+      dateOfBirth: moment(dateOfBirth, 'YYYY-MM-DD').toISOString(),
       phone,
       nationalIdNumber,
       email,
@@ -91,31 +107,17 @@ export default function FarmersBiodata({ farmer }: FarmersBiodataProps) {
       }
     );
   };
-  
 
-  // const handleSubmit = () => {
-  //   updateFarmer(
-  //     {
-  //       id: farmer._id,
-  //       data: {
-  //         fullName,
-  //         gender,
-  //         dateOfBirth,
-  //         phone,
-  //         nationalIdNumber,
-  //         email,
-  //         role,
-  //         ...(districtId && { district: districtId }),
-  //       },
-  //     },
-      
-  //     {
-  //       onSuccess: () => Alert.alert('Success', 'Farmer updated successfully'),
-  //       onError: (err: any) => Alert.alert('Error', err?.response?.data?.message || 'Update failed'),
-  //     }
-  //   );
-  // };
-  
+  const handleDateChange = (text: string) => {
+    setDateOfBirth(text);
+    
+    if (text.length === 10) {
+      const isValid = moment(text, 'YYYY-MM-DD', true).isValid();
+      if (!isValid) {
+        Alert.alert('Invalid Date', 'Please enter date in YYYY-MM-DD format');
+      }
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -133,8 +135,14 @@ export default function FarmersBiodata({ farmer }: FarmersBiodataProps) {
         <Text style={styles.label}>Gender</Text>
         <TextInput style={styles.input} value={gender} onChangeText={setGender}  />
 
-        <Text style={styles.label}>Date of Birth</Text>
-        <TextInput style={styles.input} value={dateOfBirth} onChangeText={setDateOfBirth}  />
+        <Text style={styles.label}>Date of Birth (YYYY-MM-DD)</Text>
+        <TextInput 
+          style={styles.input} 
+          value={dateOfBirth} 
+          onChangeText={handleDateChange}
+          placeholder="YYYY-MM-DD"
+          maxLength={10}
+        />
 
         <Text style={styles.label}>Phone Number</Text>
         <TextInput style={styles.input} value={phone} onChangeText={setPhone}  />
@@ -143,20 +151,25 @@ export default function FarmersBiodata({ farmer }: FarmersBiodataProps) {
         <TextInput style={styles.input} value={nationalIdNumber} onChangeText={setNationalIdNumber} />
 
         <Text style={styles.label}>District</Text>
-        <View style={styles.pickerContainer}>
-        <Picker
-        selectedValue={districtId}
-        onValueChange={(itemValue) => setDistrictId(itemValue)}
-        style={styles.picker}
-      >
-        <Picker.Item label="Select District(Optional)" value="" />
-        {districts.map((dist) => (
-          <Picker.Item key={dist._id} label={dist.name} value={dist._id} />
-        ))}
-      </Picker>
-      </View> 
+        <View style={styles.dropdownContainer}>
+          <DropDownPicker
+            open={open}
+            value={districtId}
+            items={items}
+            setOpen={setOpen}
+            setValue={setDistrictId}
+            setItems={setItems}
+            placeholder="Select District (Optional)"
+            style={styles.dropdown}
+            dropDownContainerStyle={styles.dropdownList}
+            listMode="SCROLLVIEW"
+            scrollViewProps={{
+              nestedScrollEnabled: true,
+            }}
+          />
+        </View>
 
-      <Text style={styles.label}>Upload photo</Text>
+        <Text style={styles.label}>Upload photo</Text>
         <TouchableOpacity style={styles.uploadField} onPress={async () => {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== 'granted') {
@@ -177,12 +190,9 @@ export default function FarmersBiodata({ farmer }: FarmersBiodataProps) {
             <Text style={styles.placeholder}>Upload Photo</Text>
         </TouchableOpacity>
 
-        {/* <TouchableOpacity style={styles.updateButton} onPress={() => console.log("Update button pressed")}>
-          <Text style={styles.updateButtonText}>Update</Text>
-        </TouchableOpacity> */}
         <TouchableOpacity style={styles.updateButton} onPress={handleSubmit}>
-  <Text style={styles.updateButtonText}>Update</Text>
-</TouchableOpacity>
+          <Text style={styles.updateButtonText}>Update</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -193,7 +203,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
     paddingVertical: 20,
-    //backgroundColor: '#F7F7FA',
   },
   imageContainer: {
     width: 120,
@@ -218,7 +227,7 @@ const styles = StyleSheet.create({
   formContainer: {
     width: wp('80%'),
     alignSelf: 'center',
-    marginBottom:80,
+    marginBottom: 80,
   },
   label: {
     fontSize: 16,
@@ -231,20 +240,19 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 15,
-    //backgroundColor: '#F7F7FA',
     backgroundColor: '#FFFFFF',
   },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#CCC',
-    borderRadius: 5,
+  dropdownContainer: {
     marginBottom: 15,
-    //backgroundColor: '#F7F7FA',
+    zIndex: 1000,
+  },
+  dropdown: {
+    borderColor: '#CCC',
     backgroundColor: '#FFFFFF',
   },
-  picker: {
-    height: 50,
-    width: '100%',
+  dropdownList: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#CCC',
   },
   updateButton: {
     backgroundColor: "#36813A",
@@ -270,12 +278,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     height: 50,
     paddingHorizontal: 12,
-    paddingVertical:5,
+    paddingVertical: 5,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
     backgroundColor: '#FFFFFF',
-    //backgroundColor: '#f9f9f9',
   },
   placeholder: {
     marginLeft: 10,

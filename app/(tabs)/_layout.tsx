@@ -46,18 +46,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      
-      <Tabs.Screen
-        name="livestock"
-        options={{
-          title: 'Livestock',
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <MaterialIcons name="pets" size={24} color={focused ? COLORS.white : COLORS.white} />
-          ),
-        }}
-      />
-
       <Tabs.Screen
         name="farmers"
         options={{
@@ -69,6 +57,28 @@ export default function TabLayout() {
         }}
       />
 
+      <Tabs.Screen
+        name="livestock"
+        options={{
+          title: 'Livestock',
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <MaterialIcons name="pets" size={24} color={focused ? COLORS.white : COLORS.white} />
+          ),
+        }}
+      />
+
+    <Tabs.Screen
+        name="notifications"
+        options={{
+          title: 'Notification',
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <MaterialIcons name="notifications" size={24} color={focused ? COLORS.white : COLORS.white} />
+          ),
+        }}
+      />
+
      <Tabs.Screen
         name="profile"
         options={{
@@ -76,17 +86,6 @@ export default function TabLayout() {
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <MaterialIcons name="person" size={24} color={focused ? COLORS.white : COLORS.white} />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="notifications"
-        options={{
-          title: 'Notification',
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <MaterialIcons name="notifications" size={24} color={focused ? COLORS.white : COLORS.white} />
           ),
         }}
       />

@@ -36,6 +36,19 @@ export default function FarmerLayout() {
           
         }}
       />
+      <Stack.Screen
+        name="profile"
+        options={{
+          title: 'Farmer Profile',
+        }}
+      />
+      
+      <Stack.Screen
+        name="farmermanager"
+        options={{
+          title: 'Add Farmer',
+        }}
+      />
     </Stack>
   );
 }

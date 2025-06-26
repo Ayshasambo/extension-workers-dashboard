@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {View, Text,TextInput,TouchableOpacity,StyleSheet,ScrollView,Switch,Alert} from 'react-native';
+import {View, Text,TextInput,TouchableOpacity,StyleSheet,ScrollView,Switch,Alert,Pressable, Platform } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import AppButton from '@/components/AppButton'; 
 import { COLORS } from '@/constants/theme';
 import { usePostData } from '@/hooks/usePostData';
 import { useData } from '@/hooks/useData';
 import DropDownPicker from 'react-native-dropdown-picker';
+import NetInfo from '@react-native-community/netinfo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 
 interface Farmer {
   _id: string;
@@ -43,67 +47,203 @@ export default function LivestockManager() {
   const [identifier, setIdentifier] = useState('');
   const [vaccinationHistory, setVaccinationHistory] = useState('');
   const [healthIssues, setHealthIssues] = useState('');
-  const [expectedBreedingDate, setExpectedBreedingDate] = useState('');
-  const [nextVaccinationDate, setNextVaccinationDate] = useState('');
-  const [lastHealthCheckDate, setLastHealthCheckDate] = useState('');
+  const [expectedBreedingDate, setExpectedBreedingDate] = useState<Date | null>(null);
+  const [nextVaccinationDate, setNextVaccinationDate] = useState<Date | null>(null);
+  const [lastHealthCheckDate, setLastHealthCheckDate] = useState<Date | null>(null);
+  //const [showDatePicker, setShowDatePicker] = useState(false);
   const [region, setRegion] = useState('');
   const [selectedFarmer, setSelectedFarmer] = useState<string | null>(null); 
   const [isInBreedingCycle, setIsInBreedingCycle] = useState(false);
   const [isVaccinated, setIsVaccinated] = useState(false);
   const [isAlive, setIsAlive] = useState(true);
+  const [showExpectedDatePicker, setShowExpectedDatePicker] = useState(false);
+  const [showNextVaccinationPicker, setShowNextVaccinationPicker] = useState(false);
+  const [showLastHealthCheckPicker, setShowLastHealthCheckPicker] = useState(false);
 
-  // Dropdown state
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<any[]>([]);
 
   const { mutate, isPending, isSuccess, isError } = usePostData<any, Animals>('/animals');
   const { data: farmers = [] } = useData<Farmer[]>('/farmers');
 
-  // Format farmers for dropdown
   React.useEffect(() => {
     const dropdownItems = farmers.map((farmer) => ({
       label: farmer.fullName,
       value: farmer._id
     }));
+    console.log("Dropdown items count:", dropdownItems.length); // should be 10
     setItems(dropdownItems);
   }, [farmers]);
+
+  // const handleSave = async () => {
+  //   const formData: Animals = {
+  //     type,
+  //     breed,
+  //     age: Number(age),
+  //     weight: Number(weight),
+  //     healthStatus,
+  //     farmer: selectedFarmer!, 
+  //     identifier,
+  //     vaccinationHistory: vaccinationHistory.split(',').map(s => s.trim()),
+  //     isInBreedingCycle,
+  //     expectedBreedingDate:new Date(expectedBreedingDate).toISOString(),
+  //     isVaccinated,
+  //     nextVaccinationDate:new Date(nextVaccinationDate).toISOString(),
+  //     lastHealthCheckDate:new Date(lastHealthCheckDate).toISOString(),
+  //     healthIssues: healthIssues.split(',').map(s => s.trim()),
+  //     isAlive,
+  //     region,
+  //   };
+  //   console.log('Form Data:', formData);
+  //   const netState = await NetInfo.fetch();
+  
+  //   if (netState.isConnected) {
+  //     mutate(formData, {
+  //       onError: (error: any) => {
+  //         console.log("Error saving animal:", error?.response?.data || error.message || error);
+  //         Alert.alert("Failed to save", "Please try again.");
+  //       },
+  //       onSuccess: () => {
+  //         console.log("Animal saved successfully!");
+  //         Alert.alert("Success", "Animal saved successfully!");
+  //       }
+  //     });
+  //   }
+  // };
+  
+  // useEffect(() => {
+  //   const unsubscribe = NetInfo.addEventListener(async state => {
+  //     if (state.isConnected) {
+  //       const stored = await AsyncStorage.getItem('@unsynced_animal');
+  //       if (stored) {
+  //         const parsed = JSON.parse(stored);
+  //         mutate(parsed, {
+  //           onSuccess: () => {
+  //             AsyncStorage.removeItem('@unsynced_animal');
+  //             Alert.alert('Success', 'Offline data synced successfully.');
+  //           }
+  //         });
+  //       }
+  //     }
+  //   });
+  
+  //   return () => unsubscribe(); // cleanup
+  // }, []);
+  
 
   const handleSave = () => {
     if (!selectedFarmer) {
       alert("Please select a farmer.");
       return;
     }
-    mutate({
-      type,
-      breed,
+    const requiredFields = [
+      { key: type, label: 'Livestock Type' },
+      { key: breed, label: 'Breed' },
+      { key: age, label: 'Age (in months)' },
+      { key: weight, label: 'Weight (in kg)' },
+      { key: healthStatus, label: 'Health Status' },
+      { key: identifier, label: 'Identifier' },
+      { key: vaccinationHistory, label: 'Vaccination history' },
+      //{ key: isInBreedingCycle, label: 'Is in Breeding Cycle' },
+      { key: expectedBreedingDate, label: 'Expected Breeding Date' },
+      { key: isVaccinated, label: 'Is vaccinated' },
+      { key: nextVaccinationDate, label: 'Next Vacccination Date' },
+      { key: lastHealthCheckDate, label: 'Last Health Check Date' },
+      { key: healthIssues, label: 'Health Issues' },
+      //{ key: isAlive, label: 'is Alive' },
+      { key: region, label: 'Location' }
+    ];
+  
+    for (const field of requiredFields) {
+      if (!field.key || field.key.toString().trim() === '') {
+        Alert.alert('Validation Error', `${field.label} is required.`);
+        return;
+      }
+    }  
+    const payload = {
+      type:type.trim(),
+      breed:breed.trim(),
       age: Number(age),
       weight: Number(weight),
-      healthStatus,
-      farmer: selectedFarmer, 
-      identifier,
+      healthStatus:healthStatus.trim(),
+      farmer: selectedFarmer,
+      identifier:identifier.trim(),
       vaccinationHistory: vaccinationHistory.split(',').map(s => s.trim()),
       isInBreedingCycle,
-      expectedBreedingDate,
+      expectedBreedingDate: expectedBreedingDate!.toISOString(),
       isVaccinated,
-      nextVaccinationDate,
-      lastHealthCheckDate,
+      nextVaccinationDate: nextVaccinationDate!.toISOString(),
+      lastHealthCheckDate: lastHealthCheckDate!.toISOString(),
       healthIssues: healthIssues.split(',').map(s => s.trim()),
       isAlive,
-      region,
-    }, {
+      region:region.trim(),
+    };
+  
+    console.log("🚀 Submitting payload:", JSON.stringify(payload, null, 2));
+    mutate(payload, {
       onError: (error: any) => {
+        console.error("Full error response:", error);
         console.error("API Error:", error?.response?.data || error.message);
-        alert("Failed to save. Please try again.");
+        Alert.alert("Failed", "Something went wrong.");
       },
-      onSuccess: () => {
-        console.log("Livestock saved successfully!");
-      }
+      
     });
+  
+    
+    // mutate({
+    //   type,
+    //   breed,
+    //   age: Number(age),
+    //   weight: Number(weight),
+    //   healthStatus,
+    //   farmer: selectedFarmer, 
+    //   identifier,
+    //   vaccinationHistory: vaccinationHistory.split(',').map(s => s.trim()),
+    //   isInBreedingCycle,
+    //   expectedBreedingDate:expectedBreedingDate!.toISOString(),
+    //   isVaccinated,
+    //   nextVaccinationDate:nextVaccinationDate!.toISOString(),
+    //   lastHealthCheckDate:lastHealthCheckDate!.toISOString(),
+    //   healthIssues: healthIssues.split(',').map(s => s.trim()),
+    //   isAlive,
+    //   region,
+    // }, {
+    //   onError: (error: any) => {
+    //     console.error("API Error:", error?.response?.data || error.message);
+    //     alert("Failed to save. Please try again.");
+    //   },
+    //   onSuccess: () => {
+    //     console.log("Livestock saved successfully!");
+    //   }
+    // });
+  };
+
+  const handleDateChange = (
+    selectedField: 'expected' | 'vaccination' | 'health',
+    event: any,
+    selectedDate?: Date
+  ) => {
+    if (!selectedDate) return;
+  
+    switch (selectedField) {
+      case 'expected':
+        setShowExpectedDatePicker(false);
+        setExpectedBreedingDate(selectedDate);
+        break;
+      case 'vaccination':
+        setShowNextVaccinationPicker(false);
+        setNextVaccinationDate(selectedDate);
+        break;
+      case 'health':
+        setShowLastHealthCheckPicker(false);
+        setLastHealthCheckDate(selectedDate);
+        break;
+    }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.dropdownContainer}>
+      <View style={{ marginBottom: 20, zIndex: 2000}}>
         <Text style={styles.label}>Select Farmer *</Text>
         <DropDownPicker
           open={open}
@@ -114,11 +254,15 @@ export default function LivestockManager() {
           setItems={setItems}
           placeholder="Select a farmer"
           style={styles.dropdown}
-          dropDownContainerStyle={styles.dropdownList}
+          dropDownContainerStyle={{ borderColor: '#ccc',
+          borderRadius: 8,
+          maxHeight: 800,
+          zIndex: 3000,}} 
           listMode="SCROLLVIEW"
           scrollViewProps={{
             nestedScrollEnabled: true,
           }}
+          zIndex={3000} // ensures dropdown is on top
         />
       </View>
 
@@ -207,35 +351,59 @@ export default function LivestockManager() {
       </View>
 
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Expected Breeding Date(YYYY-MM-DD)</Text>
-        <TextInput 
-          style={styles.input} 
-          placeholder="YYYY-MM-DD" 
-          value={expectedBreedingDate} 
-          onChangeText={setExpectedBreedingDate} 
-        />
+        <Text style={styles.label}>Expected Breeding Date</Text>
+        <Pressable
+          onPress={() => setShowExpectedDatePicker(true)}
+          style={[styles.input, { justifyContent: 'center' }]}
+        >
+          <Text>{expectedBreedingDate ? expectedBreedingDate.toDateString() : 'Select date'}</Text>
+        </Pressable>
+        {showExpectedDatePicker && (
+          <DateTimePicker
+            value={expectedBreedingDate || new Date()}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={(e, date) => handleDateChange('expected', e, date)}
+          />
+        )}
       </View>
 
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Next Vaccination Date (YYYY-MM-DD)</Text>
-        <TextInput 
-          style={styles.input} 
-          placeholder="YYYY-MM-DD"    
-          value={nextVaccinationDate}   
-          onChangeText={setNextVaccinationDate} 
-        />
+        <Text style={styles.label}>Next Vaccination Date</Text>
+        <Pressable
+          onPress={() => setShowNextVaccinationPicker(true)}
+          style={[styles.input, { justifyContent: 'center' }]}
+        >
+          <Text>{nextVaccinationDate ? nextVaccinationDate.toDateString() : 'Select date'}</Text>
+        </Pressable>
+        {showNextVaccinationPicker && (
+          <DateTimePicker
+            value={nextVaccinationDate || new Date()}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={(e, date) => handleDateChange('vaccination', e, date)}
+          />
+        )}
       </View>
 
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Last Health Check Date (YYYY-MM-DD)</Text>
-        <TextInput 
-          style={styles.input} 
-          placeholder="YYYY-MM-DD" 
-          value={lastHealthCheckDate} 
-          onChangeText={setLastHealthCheckDate} 
-        />
+        <Text style={styles.label}>Last Health Check Date</Text>
+        <Pressable
+          onPress={() => setShowLastHealthCheckPicker(true)}
+          style={[styles.input, { justifyContent: 'center' }]}
+        >
+          <Text>{lastHealthCheckDate ? lastHealthCheckDate.toDateString() : 'Select date'}</Text>
+        </Pressable>
+        {showLastHealthCheckPicker && (
+          <DateTimePicker
+            value={lastHealthCheckDate || new Date()}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={(e, date) => handleDateChange('health', e, date)}
+          />
+        )}
       </View>
-
+     
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Location *</Text>
         <TextInput 
@@ -276,7 +444,7 @@ export default function LivestockManager() {
       </View>
 
       <AppButton
-        label={isPending ? 'Saving...' : isSuccess ? 'Saved ✅' : 'Submit'}
+        label={isPending ? 'Saving...' : isSuccess ? 'Saved' : 'Submit'}
         onPress={handleSave}
         backgroundColor={COLORS.primary}
         color="#fff"

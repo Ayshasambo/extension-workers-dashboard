@@ -8,6 +8,7 @@ import { COLORS } from '../../../constants/theme';
 import { useRouter } from 'expo-router';
 import { useData } from '@/hooks/useData';
 import moment from 'moment';
+import { Link } from 'expo-router';
 
 
 interface NotificationItem {
@@ -103,6 +104,12 @@ export default function Notifications() {
                     keyExtractor={(item) => item._id}
                     ListEmptyComponent={<Text>No Notifications available</Text>}
                 />
+
+         <Link href="/notifications/notificationmanager" asChild>
+          <TouchableOpacity style={styles.floatingButton}>
+            <MaterialIcons name="add" size={28} color="#fff" />
+          </TouchableOpacity>
+         </Link>
             </View>
         </View>
     );
@@ -112,6 +119,7 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#FFFFFF',
         flex: 1,
+        marginBottom:100
     },
     innerContainer: {
         width: '100%',
@@ -195,6 +203,22 @@ const styles = StyleSheet.create({
         color: COLORS.gray,
         marginTop: 15,
     },
+    floatingButton: {
+        position: 'absolute',
+        bottom: hp('4%'),
+        right: wp('5%'),
+        backgroundColor: '#36813A',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    }
 });
 
 // import React from 'react';

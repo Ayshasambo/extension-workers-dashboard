@@ -1,4 +1,4 @@
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, Pressable, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
 import { usePostData } from '@/hooks/usePostData';
@@ -7,6 +7,10 @@ import { COLORS } from '@/constants/theme';
 import axios from 'axios';
 import DropDownPicker from 'react-native-dropdown-picker';
 import moment from 'moment';
+import NetInfo from '@react-native-community/netinfo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 
 
 type District = {
@@ -30,15 +34,14 @@ export default function AddFarmer() {
     
   const [fullName, setFullName] = useState('');
   const [gender, setGender] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [phone, setPhone] = useState('');
   const [nationalIdNumber, setNationalIdNumber] = useState('');
   const [email, setEmail] = useState('');
   const [districts, setDistricts] = useState<District[]>([]);
   const [districtId, setDistrictId] = useState('');
   const [role, setRole] = useState('farmer');
-  
-  // Dropdown state
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<any[]>([]);
   const [genderOpen, setGenderOpen] = useState(false);
@@ -46,6 +49,7 @@ export default function AddFarmer() {
     { label: 'Male', value: 'male' },
     { label: 'Female', value: 'female' }
   ]);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
   const { mutate, isPending, isSuccess, isError } = usePostData<any, farmers>('/farmers');
 
@@ -63,50 +67,86 @@ export default function AddFarmer() {
       .catch((err) => console.error('Failed to fetch districts:', err));
   }, []);
 
-  const handleSave = () => {
-    mutate({
-      //id,
+  // const handleSave = () => {
+  //   mutate({
+  //     //id,
+  //     fullName,
+  //     gender,
+  //     dateOfBirth,
+  //     phone,
+  //     nationalIdNumber,
+  //     email,
+  //     district: districtId,
+  //     role
+  //   });
+  // };
+  
+  const handleSave = async () => {
+    const requiredFields = [
+      { key: fullName, label: 'Full name' },
+      { key: gender, label: 'Gender' },
+      { key: dateOfBirth, label: 'Date of birth' },
+      { key: phone, label: 'Phone number' },
+      { key: nationalIdNumber, label: 'National ID Number' }
+    ];
+  
+    for (const field of requiredFields) {
+      if (!field.key || field.key.toString().trim() === '') {
+        Alert.alert('Validation Error', `${field.label} is required.`);
+        return;
+      }
+    }  
+    const formData: farmers = {
       fullName,
       gender,
-      dateOfBirth,
+      dateOfBirth:dateOfBirth!.toISOString(),
       phone,
       nationalIdNumber,
       email,
       district: districtId,
       role
-    });
-  };
-    
-
-    // addFarmer({
-    //   fullName,
-    //   gender,
-    //   dateOfBirth,
-    //   phone,
-    //   nationalIdNumber,
-    //   email,
-    //   role,
-    //   ...(districtId && { district: districtId }),
-    // },
-    // {
-    //     onSuccess: () => {
-    //       Alert.alert('Success', 'Farmer added successfully!');
-    //       setFullName('');
-    //       setGender('');
-    //       setDateOfBirth('');
-    //       setPhone('');
-    //       setNationalIdNumber('');
-    //       setEmail('');
-    //       setDistrictId('');
-    //       setRole('farmer');
-    //     },
-    //     onError: (error) => {
-    //       console.error('Error adding farmer:', error);
-    //       Alert.alert('Error', 'Failed to add farmer');
-    //     }
-    //   });
+    };
   
+    const netState = await NetInfo.fetch();
+  
+    if (netState.isConnected) {
+      mutate(formData);
+    } else {
+      try {
+        await AsyncStorage.setItem('@unsynced_farmer', JSON.stringify(formData));
+        Alert.alert('Offline', 'Data saved locally. It will be synced when network is available.');
+      } catch (error) {
+        Alert.alert('Error', 'Failed to save data locally.');
+      }
+    }
+  };
+  
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(async state => {
+      if (state.isConnected) {
+        const stored = await AsyncStorage.getItem('@unsynced_farmer');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          mutate(parsed, {
+            onSuccess: () => {
+              AsyncStorage.removeItem('@unsynced_farmer');
+              Alert.alert('Success', 'Offline data synced successfully.');
+            }
+          });
+        }
+      }
+    });
+  
+    return () => unsubscribe(); 
+  }, []);
 
+  const handleDateChange = (_event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setDateOfBirth(selectedDate);
+    }
+  };
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.inputContainer}>
@@ -137,7 +177,7 @@ export default function AddFarmer() {
         />
       </View>
 
-      <View style={styles.inputContainer}>
+      {/* <View style={styles.inputContainer}>
         <Text style={styles.label}>Date of Birth (YYYY-MM-DD) *</Text>
         <TextInput 
           style={styles.input} 
@@ -146,7 +186,27 @@ export default function AddFarmer() {
           placeholder="YYYY-MM-DD" 
           //keyboardType="phone-pad"
         />
-      </View>     
+      </View>      */}
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Date of Birth *</Text>
+        <Pressable
+          onPress={() => setShowDatePicker(true)}
+          style={[styles.input, { justifyContent: 'center' }]}
+        >
+          <Text>
+            {dateOfBirth ? dateOfBirth.toDateString() : 'Select date of birth'}
+          </Text>
+        </Pressable>
+        {showDatePicker && (
+          <DateTimePicker
+            value={dateOfBirth || new Date(2000, 0, 1)}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={handleDateChange}
+            maximumDate={new Date()}
+          />
+        )}
+      </View>
 
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Phone Number *</Text>
@@ -208,9 +268,7 @@ export default function AddFarmer() {
 
       {isError && <Text style={styles.error}>Failed to save. Please try again.</Text>}
 
-      {/* <TouchableOpacity style={styles.button} onPress={handleSave} disabled={isPending}>
-        <Text style={styles.buttonText}>{isPending ? 'Saving...' : 'Add Farmer'}</Text>
-      </TouchableOpacity> */}
+      
     </ScrollView>
   );
 }

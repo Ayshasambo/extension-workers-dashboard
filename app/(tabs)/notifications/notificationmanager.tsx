@@ -6,12 +6,11 @@ import { usePostData } from '@/hooks/usePostData';
 import { useData } from '@/hooks/useData';
 import AppButton from '@/components/AppButton'; 
 import { COLORS } from '@/constants/theme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'
 
 
   interface notifications{
-    //_id: string;
-    //iconName: keyof typeof MaterialIcons.glyphMap;
     description: string;
     affectedPlaces: string[];
     type: string;
@@ -19,7 +18,7 @@ import axios from 'axios'
     severity: 'high' | 'moderate' | 'low';
     status: string;
     category:  string;
-    //informerId:string
+    informerId?: string;
   }
 
 export default function AddNotification() {
@@ -31,57 +30,73 @@ export default function AddNotification() {
   const [severity, setseverity] = useState('');
   const [status, setStatus] = useState('');
   const [category, setcategory] = useState('');
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
-//   const handleSave = () => {
-//     console.log('Updated info:');
-//   };
-
-  //const { mutate: addFarmer, isPending } = useAddFarmer();
   const { mutate, isPending, isSuccess, isError } = usePostData<any, notifications>('/alerts');
-  //const { data: user, isLoading } = useData<{ _id: string }>('/auth/users');
+  
   const { data: user } = useData<{ _id: string }>('/alerts/users');
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const storedUser = await AsyncStorage.getItem('@user');
+        if (!storedUser) {
+          console.log('⚠️ No logged-in user found');
+          return;
+        }
+        const user = JSON.parse(storedUser);
+        console.log('👤 Loaded user:', user);
+        setCurrentUser(user);
+      } catch (error) {
+        console.error('❌ Error fetching user:', error);
+      }
+    };
+  
+    fetchUser();
+  }, []);
+  
 
-const handleSave = () => {
-    mutate({
-      description,
-      affectedPlaces:affectedPlaces.split(',').map(d => d.trim()).filter(Boolean),
-      type,
-      diseasesName:diseasesName.split(',').map(d => d.trim()).filter(Boolean),
-      severity:severity.toLowerCase() as 'high' | 'moderate' | 'low',
-      status,
-      category,
-      //informerId:{ _id: string, name: string }
-    });
+  const handleSave = () => {
+    if (!currentUser || !currentUser.id) {
+      console.warn('❌ Cannot submit alert: no user');
+      Alert.alert('Error', 'No logged-in user found.');
+      return;
+    }
+    console.log('📤 Submitting alert with:',
+    mutate(
+      {
+        description,
+        affectedPlaces: affectedPlaces.split(',').map(d => d.trim()).filter(Boolean),
+        type,
+        diseasesName: diseasesName.split(',').map(d => d.trim()).filter(Boolean),
+        severity: severity.toLowerCase() as 'high' | 'moderate' | 'low',
+        status,
+        category,
+        informerId: currentUser.id,
+      },
+      {
+        onSuccess: () => {
+          console.log('✅ Alert submitted successfully');
+        },
+        onError: (error: any) => {
+          console.log('❌ Submission failed. Error:');
+          console.log(error?.response?.data || error?.message || error);
+          Alert.alert('Failed', 'Error submitting alert');
+        },
+      }
+    ));
+  
+    // mutate({
+    //   description,
+    //   affectedPlaces: affectedPlaces.split(',').map(d => d.trim()).filter(Boolean),
+    //   type,
+    //   diseasesName: diseasesName.split(',').map(d => d.trim()).filter(Boolean),
+    //   severity: severity.toLowerCase() as 'high' | 'moderate' | 'low',
+    //   status,
+    //   category,
+    //   informerId: currentUser.id, // ✅ This is what you're missing
+    // });
   };
-    
-
-    // addFarmer({
-    //   fullName,
-    //   gender,
-    //   dateOfBirth,
-    //   phone,
-    //   nationalIdNumber,
-    //   email,
-    //   role,
-    //   ...(districtId && { district: districtId }),
-    // },
-    // {
-    //     onSuccess: () => {
-    //       Alert.alert('Success', 'Farmer added successfully!');
-    //       setFullName('');
-    //       setGender('');
-    //       setDateOfBirth('');
-    //       setPhone('');
-    //       setNationalIdNumber('');
-    //       setEmail('');
-    //       setDistrictId('');
-    //       setRole('farmer');
-    //     },
-    //     onError: (error) => {
-    //       console.error('Error adding farmer:', error);
-    //       Alert.alert('Error', 'Failed to add farmer');
-    //     }
-    //   });
+  
   
 
   return (
@@ -113,10 +128,6 @@ const handleSave = () => {
       />
 
        {isError && <Text style={styles.error}>Failed to save. Please try again.</Text>}
-
-      {/* <TouchableOpacity style={styles.button} onPress={handleSave} disabled={isPending}>
-        <Text style={styles.buttonText}>{isPending ? 'Saving...' : 'Add Farmer'}</Text>
-      </TouchableOpacity> */}
     </ScrollView>
   );
 }

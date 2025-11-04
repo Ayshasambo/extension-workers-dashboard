@@ -115,6 +115,33 @@ const Index = () => {
             
             </View>
 
+            <View style={{width: '95%', height: hp(15), margin: 5, 
+            backgroundColor: COLORS.white, borderRadius: 10, }}>
+
+            <View style={{margin: 8}}>
+            <Text style={{...FONTS.h3, color: COLORS.black}}> Total Resources </Text>
+            <Text style={{...FONTS.h2, color: COLORS.blue}}> 24 </Text>  
+            </View>
+
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
+            <View>        
+                <Text style={{...FONTS.h4, color: COLORS.black}}> 2 </Text>
+                <Text style={{...FONTS.h5, color: COLORS.gray}}> Cattle Routes </Text>        
+            </View>
+
+            <View>        
+                <Text style={{...FONTS.h4, color: COLORS.black}}> 15 </Text>
+                <Text style={{...FONTS.h5, color: COLORS.gray}}> Facilities </Text>        
+            </View>
+
+            <View>        
+                <Text style={{...FONTS.h4, color: COLORS.black}}> 7 </Text>
+                <Text style={{...FONTS.h5, color: COLORS.gray}}> Water Bodies </Text>        
+            </View>
+            </View>
+
+            </View>
+
             {/* Livestock Count Bar */}
             <View style={{width: '95%', height: hp(15), margin: 5, 
             backgroundColor: COLORS.white, borderRadius: 10, }}>
@@ -170,7 +197,7 @@ const Index = () => {
             </View>
 
             {/* Livestock Count Bar */}
-            <View style={{width: '95%',  margin: 5, 
+            {/* <View style={{width: '95%',  margin: 5, 
             backgroundColor: COLORS.white, borderRadius: 10, paddingBottom: 15}}>
 
             <View style={{margin: 8}}>
@@ -186,10 +213,10 @@ const Index = () => {
 
             </View>
 
-            </View>
+            </View> */}
 
         {/* Breeding Cycle Bar */}
-        <View style={{width: '95%',  margin: 5, 
+        {/* <View style={{width: '95%',  margin: 5, 
             backgroundColor: COLORS.white, borderRadius: 10, paddingBottom: 25 }}>
 
             <View style={{margin: 8}}>
@@ -212,7 +239,7 @@ const Index = () => {
            }
             </View>
 
-        </View>
+        </View> */}
         <View  style={{height: 100}}/>
         </ScrollView>
     );

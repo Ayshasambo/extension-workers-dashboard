@@ -73,7 +73,7 @@ export default function Notifications() {
 
                 <View style={styles.textContainer}>
                     <View style={styles.titleContainer}>
-                        <Text style={styles.title}>Disease Outbreak Alert</Text>
+                        <Text style={styles.title}>{item.type === "disease" ? "Disease Alert" : "Disaster Alert"}</Text>
                     </View>
 
                     <View style={styles.subTitleContainer}>

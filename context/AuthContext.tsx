@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (credentials: { email: string; password: string }): Promise<DecodedToken> => {
     try {
       const response = await axios.post(
-        'https://l-press-backend.onrender.com/auth/login',
+        'https://l-press-backend-b5fxazbkc9hadjbg.southafricanorth-01.azurewebsites.net/auth/login',
         credentials
       );
   

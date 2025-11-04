@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, ListRenderItem, TouchableOpacity } from 'react-native';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
@@ -26,7 +26,11 @@ interface NotificationItem {
 
 export default function Notifications() {
     const router = useRouter();
-    const { data, isLoading, error } = useData<NotificationItem[]>('/alerts');
+    const { data, isLoading, error, refetch } = useData<NotificationItem[]>('/alerts');
+    const sortedData = useMemo(() => {
+        const list = (data as NotificationItem[]) || [];
+        return [...list].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    }, [data]);
     const getIconStyle = (severity: NotificationItem['severity']) => {
         switch (severity) {
             case 'high':
@@ -99,10 +103,12 @@ export default function Notifications() {
         <View style={styles.container}>
             <View style={styles.innerContainer}>
                 <FlatList
-                    data={data as NotificationItem[]}
+                    data={sortedData}
                     renderItem={renderItem}
                     keyExtractor={(item) => item._id}
                     ListEmptyComponent={<Text>No Notifications available</Text>}
+                    refreshing={!!isLoading}
+                    onRefresh={refetch}
                 />
 
          <Link href="/notifications/notificationmanager" asChild>

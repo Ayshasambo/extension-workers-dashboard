@@ -1,7 +1,7 @@
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
-import { Picker } from '@react-native-picker/picker';
+import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
 import { usePostData } from '@/hooks/usePostData';
 import { useData } from '@/hooks/useData';
 import AppButton from '@/components/AppButton'; 
@@ -24,7 +24,7 @@ import axios from 'axios'
 export default function AddNotification() {
     
   const [description, setdescription] = useState('');
-  const [affectedPlaces, setAffectedPlaces] = useState('');
+  const [affectedPlaces, setAffectedPlaces] = useState<string[]>([]);
   const [type, settype] = useState('');
   const [diseasesName, setdiseasesName] = useState('');
   const [severity, setseverity] = useState('');
@@ -35,6 +35,33 @@ export default function AddNotification() {
   const { mutate, isPending, isSuccess, isError } = usePostData<any, notifications>('/alerts');
   
   const { data: user } = useData<{ _id: string }>('/alerts/users');
+  const alertTypeOptions = [
+    { label: 'Danger', value: 'Danger' },
+    { label: 'Disease', value: 'Disease' },
+    { label: 'Disaster', value: 'Disaster' },
+  ];
+  const severityOptions = [
+    { label: 'High', value: 'high' },
+    { label: 'Moderate', value: 'moderate' },
+    { label: 'Low', value: 'low' },
+  ];
+  const livestockOptions = [
+    { label: 'Cattle', value: 'Cattle' },
+    { label: 'Goats', value: 'Goats' },
+    { label: 'Sheep', value: 'Sheep' },
+    { label: 'Poultry (Chicken)', value: 'Poultry' },
+    { label: 'Pigs', value: 'Pigs' },
+    { label: 'Fish', value: 'Fish' },
+    { label: 'Rabbits', value: 'Rabbits' },
+  ];
+  const abujaLgaOptions = [
+    { label: 'Abaji', value: 'Abaji' },
+    { label: 'Abuja Municipal (AMAC)', value: 'Abuja Municipal' },
+    { label: 'Bwari', value: 'Bwari' },
+    { label: 'Gwagwalada', value: 'Gwagwalada' },
+    { label: 'Kuje', value: 'Kuje' },
+    { label: 'Kwali', value: 'Kwali' },
+  ];
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -65,17 +92,25 @@ export default function AddNotification() {
     mutate(
       {
         description,
-        affectedPlaces: affectedPlaces.split(',').map(d => d.trim()).filter(Boolean),
-        type,
+        affectedPlaces,
+        type: type.toLowerCase(),
         diseasesName: diseasesName.split(',').map(d => d.trim()).filter(Boolean),
         severity: severity.toLowerCase() as 'high' | 'moderate' | 'low',
-        status,
+        status: 'active',
         category,
         informerId: currentUser.id,
       },
       {
         onSuccess: () => {
           console.log('✅ Alert submitted successfully');
+          // Clear form fields after successful submit
+          setdescription('');
+          setAffectedPlaces([]);
+          settype('');
+          setdiseasesName('');
+          setseverity('');
+          setStatus('active');
+          setcategory('');
         },
         onError: (error: any) => {
           console.log('❌ Submission failed. Error:');
@@ -100,27 +135,71 @@ export default function AddNotification() {
   
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <TextInput style={styles.input} value={type} onChangeText={settype} placeholder="Disease type" />
-      <TextInput style={styles.input} value={diseasesName} onChangeText={setdiseasesName} placeholder="Name of disease" />
-      <TextInput style={styles.input} value={description} onChangeText={setdescription} placeholder="Description" />
-      <TextInput style={styles.input} value={affectedPlaces} onChangeText={setAffectedPlaces} placeholder="Affected places" />
-      {/* <TextInput style={styles.input} value={severity} onChangeText={setseverity} placeholder="Select severity" /> */}
-      <TextInput style={styles.input} value={category} onChangeText={setcategory} placeholder="Livestock Category" />
-      <TextInput style={styles.input} value={status} onChangeText={setStatus} placeholder="Status" />
-      <Picker
-        selectedValue={severity}
-        onValueChange={(itemValue) => setseverity(itemValue)}
+    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <Text style={styles.label}>Alert type</Text>
+      <Dropdown
         style={styles.input}
-        >
-        <Picker.Item label="Select severity" value="" />
-        <Picker.Item label="High" value="high" />
-        <Picker.Item label="Moderate" value="moderate" />
-        <Picker.Item label="Low" value="low" />
-        </Picker>
+        data={alertTypeOptions}
+        labelField="label"
+        valueField="value"
+        placeholder="Select alert type"
+        value={type}
+        onChange={(item: any) => settype(item.value)}
+      />
 
+      <Text style={styles.label}>Name</Text>
+      <TextInput style={styles.input} value={diseasesName} onChangeText={setdiseasesName} placeholder="Name of disease" />
+
+
+      <Text style={styles.label}>Affected places</Text>
+      <MultiSelect
+        style={styles.input}
+        data={abujaLgaOptions}
+        labelField="label"
+        valueField="value"
+        placeholder="Select affected LGAs"
+        value={affectedPlaces}
+        onChange={(items: any) => setAffectedPlaces(items)}
+      />
+      {/* <TextInput style={styles.input} value={severity} onChangeText={setseverity} placeholder="Select severity" /> */}
+      
+      <Text style={styles.label}>Livestock Category</Text>
+      <Dropdown
+        style={styles.input}
+        data={livestockOptions}
+        labelField="label"
+        valueField="value"
+        placeholder="Select livestock category"
+        value={category}
+        onChange={(item: any) => setcategory(item.value)}
+      />
+
+      {/* <Text style={styles.label}>Status</Text>
+      <TextInput style={styles.input} value={status} onChangeText={setStatus} placeholder="Status" /> */}
+
+      <Text style={styles.label}>Severity</Text>
+      <Dropdown
+        style={styles.input}
+        data={severityOptions}
+        labelField="label"
+        valueField="value"
+        placeholder="Select severity"
+        value={severity}
+        onChange={(item: any) => setseverity(item.value)}
+      />
+
+      <Text style={styles.label}>Description *</Text>
+      <TextInput
+        style={[styles.input, { height: 90, textAlignVertical: 'top' }]}
+        value={description}
+        onChangeText={setdescription}
+        placeholder="Description"
+        multiline
+        numberOfLines={3}
+      />
+      
       <AppButton
-        label={isPending ? 'Saving...' : isSuccess ? 'Saved ✅' : 'Submit'}
+        label={isPending ? 'Submitting...' : isSuccess ? 'Submitted ' : 'Submit'}
         //label={'Submit'}
         onPress={handleSave}
         backgroundColor={COLORS.primary}
@@ -137,7 +216,14 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     gap: 10,
-    marginTop:20
+    marginTop:20,
+    paddingBottom: 500,
+  },
+  label: {
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 6,
+    fontWeight: '500',
   },
   input: {
     borderWidth: 1,
